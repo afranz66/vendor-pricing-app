@@ -1,131 +1,15 @@
-import React, { useState, useEffect } from 'react';
+// frontend/src/components/vendors/ManageVendors.js
+import React, { useState } from 'react';
 import { ArrowLeft, Users, Plus, Search, Filter, Mail, Phone, MapPin, Calendar, Clock, CheckCircle, AlertCircle, Send, UserPlus, Edit3, Trash2, Star, Award, Building } from 'lucide-react';
+import { useVendorManagement } from '../../hooks/useVendorManagement';
 
-const ManageVendorsPage = ({ categoryId, onBack }) => {
-  const [category, setCategory] = useState(null);
-  const [vendors, setVendors] = useState([]);
-  const [loading, setLoading] = useState(true);
+const ManageVendors = ({ categoryId, onBack }) => {
+  const { category, vendors, statistics, loading, error, refetch } = useVendorManagement(categoryId);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [showAddVendorModal, setShowAddVendorModal] = useState(false);
   const [selectedVendors, setSelectedVendors] = useState([]);
-
-  // Mock data - in real app, this would come from your API
-  useEffect(() => {
-    setTimeout(() => {
-      const mockCategory = {
-        id: 301,
-        name: "Structural Steel",
-        description: "Primary structural steel framework and support systems",
-        totalItems: 12,
-        quotedItems: 8,
-        deadlineDate: "2025-02-01"
-      };
-
-      const mockVendors = [
-        {
-          id: 101,
-          name: "SteelCorp Industries",
-          email: "quotes@steelcorp.com",
-          phone: "(555) 123-4567",
-          address: "123 Industrial Blvd, Steel City, NY 10001",
-          website: "www.steelcorp.com",
-          bidStatus: "submitted",
-          bidAmount: 145000,
-          bidDate: "2025-01-20",
-          inviteDate: "2025-01-15",
-          lastContact: "2025-01-22",
-          rating: 4.8,
-          completedProjects: 47,
-          specialties: ["Structural Steel", "Welding", "Fabrication"],
-          certifications: ["ISO 9001", "AISC Certified"],
-          notes: "Reliable vendor with excellent track record",
-          status: "active"
-        },
-        {
-          id: 102,
-          name: "Metropolitan Steel",
-          email: "sales@metrosteel.com",
-          phone: "(555) 987-6543",
-          address: "456 Metro Ave, Steel City, NY 10002",
-          website: "www.metrosteel.com",
-          bidStatus: "submitted",
-          bidAmount: 162000,
-          bidDate: "2025-01-18",
-          inviteDate: "2025-01-15",
-          lastContact: "2025-01-20",
-          rating: 4.5,
-          completedProjects: 32,
-          specialties: ["Structural Steel", "Construction"],
-          certifications: ["ISO 9001"],
-          notes: "Good pricing, standard delivery times",
-          status: "active"
-        },
-        {
-          id: 103,
-          name: "BuildStrong Materials",
-          email: "info@buildstrong.com",
-          phone: "(555) 456-7890",
-          address: "789 Construction Way, Steel City, NY 10003",
-          website: "www.buildstrong.com",
-          bidStatus: "submitted",
-          bidAmount: 178000,
-          bidDate: "2025-01-17",
-          inviteDate: "2025-01-15",
-          lastContact: "2025-01-19",
-          rating: 4.2,
-          completedProjects: 28,
-          specialties: ["Materials Supply", "Steel", "Bulk Orders"],
-          certifications: ["AISC Certified"],
-          notes: "Bulk pricing specialist",
-          status: "active"
-        },
-        {
-          id: 104,
-          name: "ProSteel Solutions",
-          email: "contact@prosteel.com",
-          phone: "(555) 321-0987",
-          address: "321 Steel Ave, Steel City, NY 10004",
-          website: "www.prosteel.com",
-          bidStatus: "pending",
-          bidAmount: null,
-          bidDate: null,
-          inviteDate: "2025-01-15",
-          lastContact: "2025-01-16",
-          rating: 4.6,
-          completedProjects: 52,
-          specialties: ["Custom Fabrication", "Steel", "Engineering"],
-          certifications: ["ISO 9001", "AISC Certified", "AWS Certified"],
-          notes: "High-end fabrication specialist",
-          status: "invited"
-        },
-        {
-          id: 105,
-          name: "QuickSteel Corp",
-          email: "quotes@quicksteel.com",
-          phone: "(555) 654-3210",
-          address: "654 Industrial Dr, Steel City, NY 10005",
-          website: "www.quicksteel.com",
-          bidStatus: "declined",
-          bidAmount: null,
-          bidDate: null,
-          inviteDate: "2025-01-15",
-          lastContact: "2025-01-17",
-          rating: 3.9,
-          completedProjects: 19,
-          specialties: ["Fast Delivery", "Steel", "Emergency Orders"],
-          certifications: ["ISO 9001"],
-          notes: "Declined due to capacity constraints",
-          status: "declined"
-        }
-      ];
-
-      setCategory(mockCategory);
-      setVendors(mockVendors);
-      setLoading(false);
-    }, 500);
-  }, [categoryId]);
 
   const formatCurrency = (amount) => {
     if (!amount) return 'N/A';
@@ -166,6 +50,7 @@ const ManageVendorsPage = ({ categoryId, onBack }) => {
   };
 
   const getRatingStars = (rating) => {
+    if (!rating) return null;
     return Array.from({ length: 5 }, (_, i) => (
       <Star
         key={i}
@@ -176,9 +61,9 @@ const ManageVendorsPage = ({ categoryId, onBack }) => {
   };
 
   const filteredVendors = vendors.filter(vendor => {
-    const matchesSearch = vendor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         vendor.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         vendor.specialties.some(s => s.toLowerCase().includes(searchTerm.toLowerCase()));
+    const matchesSearch = vendor.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         vendor.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         vendor.specialties?.some(s => s.toLowerCase().includes(searchTerm.toLowerCase()));
     
     const matchesStatus = statusFilter === 'all' || vendor.bidStatus === statusFilter;
     
@@ -199,7 +84,35 @@ const ManageVendorsPage = ({ categoryId, onBack }) => {
       <div className="max-w-7xl mx-auto p-8">
         <div className="text-center py-20">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-slate-600">Loading vendor management...</p>
+          <p className="mt-4 text-slate-600">Loading vendor management data...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !category) {
+    return (
+      <div className="max-w-7xl mx-auto p-8">
+        <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-white/20">
+          <div className="text-center">
+            <AlertCircle className="h-12 w-12 text-red-600 mx-auto mb-4" />
+            <h2 className="text-xl font-bold text-slate-800 mb-2">Unable to Load Vendor Data</h2>
+            <p className="text-red-600 mb-4">{error || 'Category not found'}</p>
+            <div className="flex justify-center gap-4">
+              <button 
+                onClick={refetch}
+                className="bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 transition-colors font-semibold"
+              >
+                Try Again
+              </button>
+              <button 
+                onClick={onBack}
+                className="border border-slate-300 text-slate-700 px-6 py-3 rounded-xl hover:bg-slate-50 transition-colors font-semibold"
+              >
+                Back
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -249,23 +162,23 @@ const ManageVendorsPage = ({ categoryId, onBack }) => {
       <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border border-white/30 p-6 mb-8">
         <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
           <div className="text-center">
-            <p className="text-3xl font-bold text-slate-800">{vendors.length}</p>
+            <p className="text-3xl font-bold text-slate-800">{statistics.totalVendors || 0}</p>
             <p className="text-sm text-slate-600 font-medium">Total Vendors</p>
           </div>
           <div className="text-center">
-            <p className="text-3xl font-bold text-green-600">{vendors.filter(v => v.bidStatus === 'submitted').length}</p>
+            <p className="text-3xl font-bold text-green-600">{statistics.quotesReceived || 0}</p>
             <p className="text-sm text-slate-600 font-medium">Quotes Received</p>
           </div>
           <div className="text-center">
-            <p className="text-3xl font-bold text-yellow-600">{vendors.filter(v => v.bidStatus === 'pending').length}</p>
+            <p className="text-3xl font-bold text-yellow-600">{statistics.pendingQuotes || 0}</p>
             <p className="text-sm text-slate-600 font-medium">Pending</p>
           </div>
           <div className="text-center">
-            <p className="text-3xl font-bold text-blue-600">{vendors.filter(v => v.bidStatus === 'invited' || v.status === 'invited').length}</p>
+            <p className="text-3xl font-bold text-blue-600">{statistics.invitedVendors || 0}</p>
             <p className="text-sm text-slate-600 font-medium">Invited</p>
           </div>
           <div className="text-center">
-            <p className="text-3xl font-bold text-red-600">{vendors.filter(v => v.bidStatus === 'declined').length}</p>
+            <p className="text-3xl font-bold text-red-600">{statistics.declinedVendors || 0}</p>
             <p className="text-sm text-slate-600 font-medium">Declined</p>
           </div>
         </div>
@@ -364,12 +277,18 @@ const ManageVendorsPage = ({ categoryId, onBack }) => {
                       {getStatusBadge(vendor.bidStatus)}
                     </div>
                     <div className="flex items-center gap-4 text-sm text-slate-600">
-                      <div className="flex items-center gap-1">
-                        {getRatingStars(vendor.rating)}
-                        <span className="ml-1 font-medium">{vendor.rating}</span>
-                      </div>
-                      <span>•</span>
-                      <span>{vendor.completedProjects} completed projects</span>
+                      {vendor.rating && (
+                        <>
+                          <div className="flex items-center gap-1">
+                            {getRatingStars(vendor.rating)}
+                            <span className="ml-1 font-medium">{vendor.rating}</span>
+                          </div>
+                          <span>•</span>
+                        </>
+                      )}
+                      {vendor.completedProjects && (
+                        <span>{vendor.completedProjects} completed projects</span>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -421,20 +340,24 @@ const ManageVendorsPage = ({ categoryId, onBack }) => {
                     Specialties & Certifications
                   </h4>
                   <div className="space-y-2">
-                    <div className="flex flex-wrap gap-1">
-                      {vendor.specialties.map((specialty, index) => (
-                        <span key={index} className="bg-blue-100 text-blue-800 px-2 py-1 rounded-lg text-xs font-medium">
-                          {specialty}
-                        </span>
-                      ))}
-                    </div>
-                    <div className="flex flex-wrap gap-1">
-                      {vendor.certifications.map((cert, index) => (
-                        <span key={index} className="bg-green-100 text-green-800 px-2 py-1 rounded-lg text-xs font-medium">
-                          {cert}
-                        </span>
-                      ))}
-                    </div>
+                    {vendor.specialties && (
+                      <div className="flex flex-wrap gap-1">
+                        {vendor.specialties.map((specialty, index) => (
+                          <span key={index} className="bg-blue-100 text-blue-800 px-2 py-1 rounded-lg text-xs font-medium">
+                            {specialty}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                    {vendor.certifications && (
+                      <div className="flex flex-wrap gap-1">
+                        {vendor.certifications.map((cert, index) => (
+                          <span key={index} className="bg-green-100 text-green-800 px-2 py-1 rounded-lg text-xs font-medium">
+                            {cert}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -565,4 +488,4 @@ const ManageVendorsPage = ({ categoryId, onBack }) => {
   );
 };
 
-export default ManageVendorsPage;
+export default ManageVendors;

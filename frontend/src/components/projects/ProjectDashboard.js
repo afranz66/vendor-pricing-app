@@ -1,8 +1,8 @@
 // frontend/src/components/projects/ProjectDashboard.js
-// Updated to include navigation to the new pages
+// Updated to work with your actual data structure
 
 import React, { useState } from 'react';
-import { ArrowLeft, Calendar, Users, TrendingUp, AlertCircle, CheckCircle, Clock, DollarSign, Award, Eye, Settings } from 'lucide-react';
+import { ArrowLeft, Calendar, Users, TrendingUp, AlertCircle, CheckCircle, Clock, DollarSign, Award, Eye, Settings, Building } from 'lucide-react';
 import { useProjectDetails } from '../../hooks/useApi';
 
 const ProjectDashboard = ({ 
@@ -16,7 +16,23 @@ const ProjectDashboard = ({
   // Fetch comprehensive project data using your existing hook
   const { project, categories, loading, error, refetch, hasCategories, hasVendors } = useProjectDetails(projectId);
 
-  // ... existing loading and error handling code stays the same ...
+  // Helper function to calculate analysis from your actual data structure
+  const calculateCategoryAnalysis = (category) => {
+    const vendorParticipation = category.vendorParticipation || [];
+    const submittedBids = vendorParticipation.filter(v => v.bidStatus === 'submitted');
+    const bestQuote = submittedBids.length > 0 ? Math.min(...submittedBids.map(v => v.bidAmount)) : null;
+    const estimatedSavings = bestQuote && category.estimatedValue ? Math.max(0, category.estimatedValue - bestQuote) : 0;
+    
+    return {
+      quotedVendors: submittedBids.length,
+      vendorCount: vendorParticipation.length,
+      completedItems: category.quotedItems || 0,
+      totalItems: category.totalItems || 0,
+      bestQuote: bestQuote,
+      estimatedSavings: estimatedSavings,
+      competitionLevel: submittedBids.length >= 3 ? "High Competition" : submittedBids.length > 0 ? "Low Competition" : "No Competition"
+    };
+  };
 
   if (loading) {
     return (
@@ -107,7 +123,7 @@ const ProjectDashboard = ({
                 {project.name}
               </h1>
               <p className="text-lg text-slate-600 font-medium">
-                {project.address}
+                {project.location?.address || project.address || 'No address provided'}
               </p>
             </div>
             <div className="text-right">
@@ -184,15 +200,8 @@ const ProjectDashboard = ({
             <div className="p-8">
               <div className="space-y-6">
                 {categories.map(category => {
-                  const analysis = category.analysis || {
-                    quotedVendors: 0,
-                    vendorCount: 0,
-                    completedItems: 0,
-                    totalItems: 0,
-                    bestQuote: null,
-                    estimatedSavings: 0,
-                    competitionLevel: "No Competition"
-                  };
+                  // Calculate analysis from your actual data structure
+                  const analysis = calculateCategoryAnalysis(category);
                   
                   return (
                     <div key={category.id} className="bg-gradient-to-br from-white to-slate-50 border-2 border-slate-200 rounded-2xl p-6 hover:shadow-lg transition-all duration-300 cursor-pointer group">
@@ -232,11 +241,13 @@ const ProjectDashboard = ({
                       <div className="mb-4">
                         <div className="flex justify-between items-center mb-2">
                           <span className="text-sm font-semibold text-slate-700">
-                            {Math.round((analysis.completedItems / analysis.totalItems) * 100)}% complete
+                            {analysis.totalItems > 0 ? Math.round((analysis.completedItems / analysis.totalItems) * 100) : 0}% complete
                           </span>
                           <span className={`text-sm font-bold px-3 py-1 rounded-full ${
                             analysis.competitionLevel === 'High Competition' 
                               ? 'bg-green-100 text-green-800' 
+                              : analysis.competitionLevel === 'Low Competition'
+                              ? 'bg-yellow-100 text-yellow-800'
                               : 'bg-gray-100 text-gray-800'
                           }`}>
                             {analysis.competitionLevel}
@@ -247,12 +258,12 @@ const ProjectDashboard = ({
                             className={`h-full bg-gradient-to-r ${
                               category.status === 'complete' ? 'from-green-500 to-emerald-600' : 'from-orange-400 to-yellow-500'
                             } transition-all duration-1000 ease-out`}
-                            style={{ width: `${(analysis.completedItems / analysis.totalItems) * 100}%` }}
+                            style={{ width: `${analysis.totalItems > 0 ? (analysis.completedItems / analysis.totalItems) * 100 : 0}%` }}
                           ></div>
                         </div>
                       </div>
 
-                      {/* Action Buttons - Updated to use the navigation props */}
+                      {/* Action Buttons */}
                       <div className="flex justify-end gap-3">
                         <button 
                           onClick={(e) => {

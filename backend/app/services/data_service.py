@@ -172,31 +172,73 @@ class DataService:
         return next((category for category in categories if category["id"] == category_id), None)
     
     # Relationship helper methods - these combine data from multiple collections
-    
+    # backend/app/services/data_service.py
+    # Add this method or update your existing get_enriched_vendors_for_category method
+
     def get_enriched_vendors_for_category(self, category_id: int) -> List[Dict[str, Any]]:
         """
         Get vendor information enriched with bid details for a specific category.
-        This is the key method that enables your enhanced vendor display with contact info.
+        Maps your JSON structure to what the frontend expects.
         """
-        category = self.get_category_by_id(category_id)
+        data = self._read_data()
+        
+        # Find the category
+        category = next((cat for cat in data.get("categories", []) if cat["id"] == category_id), None)
         if not category:
             return []
         
+        # Get all vendors
+        all_vendors = data.get("vendors", [])
+        
+        # Build enriched vendor list
         enriched_vendors = []
+        
         for participation in category.get("vendorParticipation", []):
-            vendor = self.get_vendor_by_id(participation["vendorId"])
-            if vendor:
-                # Combine vendor profile with bid-specific information
-                enriched_vendor = {
-                    **vendor,  # Full vendor profile from catalog
-                    "bidInfo": {  # Project-specific bidding information
-                        "bidAmount": participation["bidAmount"],
-                        "bidStatus": participation["bidStatus"],
-                        "bidDate": participation["bidDate"],
-                        "notes": participation.get("notes", "")
-                    }
-                }
-                enriched_vendors.append(enriched_vendor)
+            vendor_id = participation["vendorId"]
+            
+            # Find the vendor details
+            vendor = next((v for v in all_vendors if v["id"] == vendor_id), None)
+            if not vendor:
+                continue
+                
+            # Map your JSON structure to frontend expectations
+            enriched_vendor = {
+                # Basic vendor info - map companyName to name
+                "id": vendor["id"],
+                "name": vendor["companyName"],  # ← Map companyName to name
+                
+                # Flatten contact info
+                "email": vendor["contactInfo"]["email"],
+                "phone": vendor["contactInfo"]["phone"],
+                "website": vendor["contactInfo"].get("website", ""),
+                
+                # Address - flatten or combine
+                "address": f"{vendor['address']['street']}, {vendor['address']['city']}, {vendor['address']['state']} {vendor['address']['zipCode']}",
+                
+                # Bid information from vendorParticipation
+                "bidAmount": participation["bidAmount"],
+                "bidStatus": participation["bidStatus"],
+                "bidDate": participation["bidDate"],
+                "notes": participation.get("notes", ""),
+                
+                # Vendor details
+                "specialties": vendor.get("specialties", []),
+                "dateAdded": vendor.get("dateAdded"),
+                "lastUpdated": vendor.get("lastUpdated"),
+                
+                # Add defaults for fields not in your JSON but expected by frontend
+                "rating": 4.5,  # Default rating
+                "completedProjects": 25,  # Default project count
+                "deliveryTime": "4-6 weeks",  # Default delivery
+                "warranty": "2 years",  # Default warranty
+                "certifications": ["ISO 9001"],  # Default certifications
+                
+                # Timeline fields
+                "inviteDate": participation.get("inviteDate", participation["bidDate"]),
+                "lastContact": vendor.get("lastUpdated")
+            }
+            
+            enriched_vendors.append(enriched_vendor)
         
         return enriched_vendors
     

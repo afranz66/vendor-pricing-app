@@ -1,81 +1,12 @@
-import React, { useState, useEffect } from 'react';
+// frontend/src/components/projects/QuoteComparison.js
+import React, { useState } from 'react';
 import { ArrowLeft, TrendingUp, Award, Clock, DollarSign, FileText, Phone, Mail, MapPin, CheckCircle, AlertCircle, Calendar, Info } from 'lucide-react';
+import { useQuoteComparison } from '../../hooks/useQuoteComparison';
 
-const QuoteComparisonPage = ({ categoryId, onBack }) => {
-  const [category, setCategory] = useState(null);
-  const [vendors, setVendors] = useState([]);
-  const [loading, setLoading] = useState(true);
+const QuoteComparison = ({ categoryId, onBack }) => {
+  const { category, vendors, analytics, loading, error, refetch } = useQuoteComparison(categoryId);
   const [sortBy, setSortBy] = useState('bidAmount');
   const [sortOrder, setSortOrder] = useState('asc');
-
-  // Mock data - in real app, this would come from your API
-  useEffect(() => {
-    // Simulate API call
-    setTimeout(() => {
-      const mockCategory = {
-        id: 301,
-        name: "Structural Steel",
-        description: "Primary structural steel framework and support systems",
-        totalItems: 12,
-        quotedItems: 8,
-        estimatedValue: 150000,
-        deadlineDate: "2025-02-01",
-        specifications: "Steel grade A992, all connections welded"
-      };
-
-      const mockVendors = [
-        {
-          id: 101,
-          name: "SteelCorp Industries",
-          email: "quotes@steelcorp.com",
-          phone: "(555) 123-4567",
-          address: "123 Industrial Blvd, Steel City, NY 10001",
-          bidAmount: 145000,
-          bidStatus: "submitted",
-          bidDate: "2025-01-20",
-          notes: "Includes expedited delivery option",
-          deliveryTime: "3-4 weeks",
-          warranty: "5 years",
-          certifications: ["ISO 9001", "AISC Certified"],
-          savings: 33000
-        },
-        {
-          id: 102,
-          name: "Metropolitan Steel",
-          email: "sales@metrosteel.com",
-          phone: "(555) 987-6543",
-          address: "456 Metro Ave, Steel City, NY 10002",
-          bidAmount: 162000,
-          bidStatus: "submitted",
-          bidDate: "2025-01-18",
-          notes: "Standard delivery timeline",
-          deliveryTime: "4-5 weeks",
-          warranty: "3 years",
-          certifications: ["ISO 9001"],
-          savings: 16000
-        },
-        {
-          id: 103,
-          name: "BuildStrong Materials",
-          email: "info@buildstrong.com",
-          phone: "(555) 456-7890",
-          address: "789 Construction Way, Steel City, NY 10003",
-          bidAmount: 178000,
-          bidStatus: "submitted",
-          bidDate: "2025-01-17",
-          notes: "Bulk pricing available for future projects",
-          deliveryTime: "5-6 weeks",
-          warranty: "2 years",
-          certifications: ["AISC Certified"],
-          savings: 0
-        }
-      ];
-
-      setCategory(mockCategory);
-      setVendors(mockVendors);
-      setLoading(false);
-    }, 500);
-  }, [categoryId]);
 
   const sortVendors = (vendors) => {
     return [...vendors].sort((a, b) => {
@@ -96,6 +27,7 @@ const QuoteComparisonPage = ({ categoryId, onBack }) => {
   };
 
   const formatCurrency = (amount) => {
+    if (!amount) return 'N/A';
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
@@ -104,6 +36,7 @@ const QuoteComparisonPage = ({ categoryId, onBack }) => {
   };
 
   const formatDate = (dateString) => {
+    if (!dateString) return 'N/A';
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
@@ -139,7 +72,35 @@ const QuoteComparisonPage = ({ categoryId, onBack }) => {
       <div className="max-w-7xl mx-auto p-8">
         <div className="text-center py-20">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-slate-600">Loading quote comparison...</p>
+          <p className="mt-4 text-slate-600">Loading quote comparison data...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !category) {
+    return (
+      <div className="max-w-7xl mx-auto p-8">
+        <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-white/20">
+          <div className="text-center">
+            <AlertCircle className="h-12 w-12 text-red-600 mx-auto mb-4" />
+            <h2 className="text-xl font-bold text-slate-800 mb-2">Unable to Load Quote Data</h2>
+            <p className="text-red-600 mb-4">{error || 'Category not found'}</p>
+            <div className="flex justify-center gap-4">
+              <button 
+                onClick={refetch}
+                className="bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 transition-colors font-semibold"
+              >
+                Try Again
+              </button>
+              <button 
+                onClick={onBack}
+                className="border border-slate-300 text-slate-700 px-6 py-3 rounded-xl hover:bg-slate-50 transition-colors font-semibold"
+              >
+                Back
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -202,7 +163,7 @@ const QuoteComparisonPage = ({ categoryId, onBack }) => {
             </div>
             <div>
               <p className="text-sm text-slate-600 font-medium">Specifications</p>
-              <p className="text-slate-800 font-semibold">{category.specifications}</p>
+              <p className="text-slate-800 font-semibold">{category.specifications || 'N/A'}</p>
             </div>
           </div>
         </div>
@@ -219,7 +180,6 @@ const QuoteComparisonPage = ({ categoryId, onBack }) => {
           >
             <option value="bidAmount">Price</option>
             <option value="bidDate">Date Submitted</option>
-            <option value="savings">Potential Savings</option>
             <option value="deliveryTime">Delivery Time</option>
           </select>
           <button
@@ -261,9 +221,6 @@ const QuoteComparisonPage = ({ categoryId, onBack }) => {
                   </div>
                   <div className="text-right">
                     <p className="text-4xl font-bold text-slate-800">{formatCurrency(vendor.bidAmount)}</p>
-                    {vendor.savings > 0 && (
-                      <p className="text-green-600 font-semibold">Save {formatCurrency(vendor.savings)}</p>
-                    )}
                   </div>
                 </div>
               </div>
@@ -275,21 +232,21 @@ const QuoteComparisonPage = ({ categoryId, onBack }) => {
                     <Clock className="w-5 h-5 text-blue-600" />
                     <div>
                       <p className="text-sm text-slate-600 font-medium">Delivery</p>
-                      <p className="font-semibold text-slate-800">{vendor.deliveryTime}</p>
+                      <p className="font-semibold text-slate-800">{vendor.deliveryTime || 'N/A'}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
                     <CheckCircle className="w-5 h-5 text-green-600" />
                     <div>
                       <p className="text-sm text-slate-600 font-medium">Warranty</p>
-                      <p className="font-semibold text-slate-800">{vendor.warranty}</p>
+                      <p className="font-semibold text-slate-800">{vendor.warranty || 'N/A'}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
                     <Award className="w-5 h-5 text-purple-600" />
                     <div>
                       <p className="text-sm text-slate-600 font-medium">Certifications</p>
-                      <p className="font-semibold text-slate-800">{vendor.certifications.join(', ')}</p>
+                      <p className="font-semibold text-slate-800">{vendor.certifications?.join(', ') || 'N/A'}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
@@ -322,7 +279,7 @@ const QuoteComparisonPage = ({ categoryId, onBack }) => {
 
                 {/* Notes */}
                 {vendor.notes && (
-                  <div className="bg-blue-50 rounded-2xl p-4">
+                  <div className="bg-blue-50 rounded-2xl p-4 mb-4">
                     <h4 className="font-semibold text-slate-800 mb-2">Additional Notes</h4>
                     <p className="text-slate-700">{vendor.notes}</p>
                   </div>
@@ -354,20 +311,20 @@ const QuoteComparisonPage = ({ categoryId, onBack }) => {
           <h3 className="text-xl font-bold text-slate-800 mb-4">Quote Summary</h3>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div>
-              <p className="text-2xl font-bold text-green-600">{formatCurrency(Math.min(...vendors.map(v => v.bidAmount)))}</p>
+              <p className="text-2xl font-bold text-green-600">{formatCurrency(analytics.bestQuote)}</p>
               <p className="text-sm text-slate-600 font-medium">Best Quote</p>
             </div>
             <div>
-              <p className="text-2xl font-bold text-slate-800">{formatCurrency(vendors.reduce((sum, v) => sum + v.bidAmount, 0) / vendors.length)}</p>
+              <p className="text-2xl font-bold text-slate-800">{formatCurrency(analytics.averageQuote)}</p>
               <p className="text-sm text-slate-600 font-medium">Average Quote</p>
             </div>
             <div>
-              <p className="text-2xl font-bold text-blue-600">{formatCurrency(Math.max(...vendors.map(v => v.savings)))}</p>
-              <p className="text-sm text-slate-600 font-medium">Max Savings</p>
+              <p className="text-2xl font-bold text-blue-600">{analytics.submittedQuotes}</p>
+              <p className="text-sm text-slate-600 font-medium">Submitted Quotes</p>
             </div>
             <div>
-              <p className="text-2xl font-bold text-purple-600">{vendors.length}</p>
-              <p className="text-sm text-slate-600 font-medium">Total Quotes</p>
+              <p className="text-2xl font-bold text-purple-600">{analytics.totalVendors}</p>
+              <p className="text-sm text-slate-600 font-medium">Total Vendors</p>
             </div>
           </div>
         </div>
@@ -376,4 +333,4 @@ const QuoteComparisonPage = ({ categoryId, onBack }) => {
   );
 };
 
-export default QuoteComparisonPage;
+export default QuoteComparison;
