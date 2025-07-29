@@ -281,3 +281,212 @@ class DataService:
             "activeVendors": active_vendors,
             "completionPercentage": completion_percentage
         }
+
+    def create_new_project(self, project_data: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Create a new project and add it to the JSON file.
+        This is the core method for adding new projects to your system.
+        """
+        data = self._read_data()
+        
+        # Generate new project ID
+        existing_ids = [project["id"] for project in data.get("projects", [])]
+        new_id = max(existing_ids, default=0) + 1
+        
+        # Create the new project with all required fields
+        new_project = {
+            "id": new_id,
+            "name": project_data.get("name", ""),
+            "client": project_data.get("client", ""),
+            "startDate": project_data.get("startDate", ""),
+            "bidDeadline": project_data.get("bidDeadline", ""),
+            "estimatedValue": project_data.get("estimatedValue", 0),
+            "status": project_data.get("status", "early"),
+            "description": project_data.get("description", ""),
+            "location": {
+                "address": project_data.get("address", ""),
+                "city": project_data.get("city", ""),
+                "state": project_data.get("state", ""),
+                "zipCode": project_data.get("zipCode", "")
+            },
+            "clientContact": {
+                "name": project_data.get("clientContactName", ""),
+                "email": project_data.get("clientContactEmail", ""),
+                "phone": project_data.get("clientContactPhone", "")
+            },
+            "documentIds": [],  # Start with empty documents
+            "categoryIds": [],  # Start with empty categories
+            "createdDate": datetime.now().strftime("%Y-%m-%d"),
+            "lastUpdated": datetime.now().strftime("%Y-%m-%d")
+        }
+        
+        # Add to projects array
+        data.setdefault("projects", []).append(new_project)
+        
+        # Save to file
+        if self._write_data(data):
+            return new_project
+        else:
+            raise Exception("Failed to save new project")
+
+    def update_project(self, project_id: int, updates: Dict[str, Any]) -> bool:
+        """
+        Update an existing project's information.
+        This allows editing project details after creation.
+        """
+        data = self._read_data()
+        
+        projects = data.get("projects", [])
+        project = next((p for p in projects if p["id"] == project_id), None)
+        
+        if not project:
+            return False
+        
+        # Update basic fields
+        updatable_fields = [
+            "name", "client", "startDate", "bidDeadline", 
+            "estimatedValue", "status", "description"
+        ]
+        
+        for field in updatable_fields:
+            if field in updates:
+                project[field] = updates[field]
+        
+        # Update location if provided
+        if any(field in updates for field in ["address", "city", "state", "zipCode"]):
+            if "address" in updates:
+                project["location"]["address"] = updates["address"]
+            if "city" in updates:
+                project["location"]["city"] = updates["city"]
+            if "state" in updates:
+                project["location"]["state"] = updates["state"]
+            if "zipCode" in updates:
+                project["location"]["zipCode"] = updates["zipCode"]
+        
+        # Update client contact if provided
+        if any(field in updates for field in ["clientContactName", "clientContactEmail", "clientContactPhone"]):
+            if "clientContactName" in updates:
+                project["clientContact"]["name"] = updates["clientContactName"]
+            if "clientContactEmail" in updates:
+                project["clientContact"]["email"] = updates["clientContactEmail"]
+            if "clientContactPhone" in updates:
+                project["clientContact"]["phone"] = updates["clientContactPhone"]
+        
+        # Update timestamp
+        project["lastUpdated"] = datetime.now().strftime("%Y-%m-%d")
+        
+        return self._write_data(data)
+
+    def delete_project(self, project_id: int) -> bool:
+        """
+        Delete a project and all its associated categories.
+        This removes the project entirely from the system.
+        """
+        data = self._read_data()
+        
+        # Remove project
+        projects = data.get("projects", [])
+        data["projects"] = [p for p in projects if p["id"] != project_id]
+        
+        # Remove associated categories
+        categories = data.get("categories", [])
+        data["categories"] = [c for c in categories if c["projectId"] != project_id]
+        
+        # Remove associated documents (optional - you might want to keep them)
+        documents = data.get("documents", [])
+        data["documents"] = [d for d in documents if d["projectId"] != project_id]
+        
+        return self._write_data(data)
+
+    def add_category_to_project(self, project_id: int, category_data: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Add a new category to an existing project.
+        This allows building out project structure after creation.
+        """
+        data = self._read_data()
+        
+        # Verify project exists
+        project = next((p for p in data.get("projects", []) if p["id"] == project_id), None)
+        if not project:
+            raise Exception("Project not found")
+        
+        # Generate new category ID
+        existing_ids = [category["id"] for category in data.get("categories", [])]
+        new_id = max(existing_ids, default=300) + 1
+        
+        # Create new category
+        new_category = {
+            "id": new_id,
+            "projectId": project_id,
+            "name": category_data.get("name", ""),
+            "description": category_data.get("description", ""),
+            "totalItems": category_data.get("totalItems", 0),
+            "quotedItems": 0,  # Start with 0 quoted items
+            "status": "pending",  # Start as pending
+            "vendorParticipation": [],  # Start with no vendors
+            "specifications": category_data.get("specifications", ""),
+            "estimatedValue": category_data.get("estimatedValue", 0),
+            "deadlineDate": category_data.get("deadlineDate", "")
+        }
+        
+        # Add to categories array
+        data.setdefault("categories", []).append(new_category)
+        
+        # Update project's category IDs
+        project.setdefault("categoryIds", []).append(new_id)
+        project["lastUpdated"] = datetime.now().strftime("%Y-%m-%d")
+        
+        # Save to file
+        if self._write_data(data):
+            return new_category
+        else:
+            raise Exception("Failed to save new category")
+
+    def get_project_templates(self) -> List[Dict[str, Any]]:
+        """
+        Get common project templates to speed up project creation.
+        This provides pre-filled templates for common project types.
+        """
+        templates = [
+            {
+                "name": "Office Building",
+                "description": "Multi-story office complex with retail and parking",
+                "estimatedValue": 2500000,
+                "status": "early",
+                "commonCategories": [
+                    {"name": "Structural Steel", "description": "Primary structural framework"},
+                    {"name": "Concrete & Masonry", "description": "Foundation and structural concrete"},
+                    {"name": "HVAC Systems", "description": "Heating, ventilation, and air conditioning"},
+                    {"name": "Electrical", "description": "Electrical systems and wiring"},
+                    {"name": "Plumbing", "description": "Water and waste systems"}
+                ]
+            },
+            {
+                "name": "Residential Development", 
+                "description": "Multi-family residential complex with amenities",
+                "estimatedValue": 1500000,
+                "status": "early",
+                "commonCategories": [
+                    {"name": "Foundation", "description": "Concrete foundation systems"},
+                    {"name": "Framing", "description": "Structural framing and roofing"},
+                    {"name": "Siding & Roofing", "description": "Exterior materials"},
+                    {"name": "Interior Finishes", "description": "Flooring, paint, and fixtures"},
+                    {"name": "Landscaping", "description": "Site preparation and landscaping"}
+                ]
+            },
+            {
+                "name": "Warehouse/Industrial",
+                "description": "Industrial warehouse or manufacturing facility", 
+                "estimatedValue": 3000000,
+                "status": "early",
+                "commonCategories": [
+                    {"name": "Pre-Engineered Building", "description": "Metal building systems"},
+                    {"name": "Site Work", "description": "Grading, utilities, and paving"},
+                    {"name": "Loading Docks", "description": "Dock equipment and doors"},
+                    {"name": "Industrial Electrical", "description": "Heavy-duty electrical systems"},
+                    {"name": "Fire Protection", "description": "Sprinkler and safety systems"}
+                ]
+            }
+        ]
+        
+        return templates

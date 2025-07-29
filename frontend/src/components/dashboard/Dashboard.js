@@ -9,7 +9,7 @@ import ErrorCard from '../shared/ErrorCard';
 import ProjectSummaryCard from './ProjectSummaryCard';
 import MetricCard from './MetricCard';
 
-const Dashboard = ({ onProjectClick }) => {
+const Dashboard = ({ onProjectClick, onCreateProjectClick }) => {
   // Fetch projects data using our custom hook
   const { projects, loading, error, refetchProjects } = useProjects();
 
@@ -51,7 +51,10 @@ const Dashboard = ({ onProjectClick }) => {
                 Manage your projects and track bidding progress across all active jobs
               </p>
             </div>
-            <button className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white px-8 py-4 rounded-2xl hover:from-blue-700 hover:to-indigo-800 transition-all duration-200 flex items-center gap-3 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105">
+            <button
+              onClick={onCreateProjectClick} 
+              className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white px-8 py-4 rounded-2xl hover:from-blue-700 hover:to-indigo-800 transition-all duration-200 flex items-center gap-3 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105"
+            >
               <Plus size={24} />
               New Project
             </button>

@@ -13,6 +13,7 @@ import ErrorCard from './components/shared/ErrorCard';
 // Import your new components
 import QuoteComparison from './components/projects/QuoteComparison';
 import ManageVendors from './components/vendors/ManageVendors';
+import CreateProject from './components/projects/CreateProject';
 
 function App() {
   const [currentView, setCurrentView] = useState('dashboard');
@@ -51,7 +52,13 @@ function App() {
     }));
     setCurrentView('vendor-management');
   };
-
+  const handleCreateProjectClick = () => {
+    setNavigationState(prevState => ({
+      ...prevState,
+      previousView: currentView
+    }));
+    setCurrentView('create-project');
+  };
   // Handle back navigation
   const handleBackNavigation = () => {
     const { previousView } = navigationState;
@@ -75,6 +82,15 @@ function App() {
           previousView: 'dashboard'
         }));
         break;
+
+      case 'create-project':
+        setCurrentView('dashboard');
+        setNavigationState({
+          selectedProjectId: null,
+          selectedCategoryId: null,
+          previousView: null
+        });
+        break;
         
       default:
         setCurrentView('dashboard');
@@ -89,6 +105,7 @@ function App() {
         return (
           <Dashboard 
             onProjectClick={handleProjectClick}
+            onCreateProjectClick={handleCreateProjectClick}
           />
         );
 
@@ -117,6 +134,18 @@ function App() {
             categoryId={navigationState.selectedCategoryId}
             projectId={navigationState.selectedProjectId}
             onBack={handleBackNavigation}
+          />
+        );
+      
+      case 'create-project':
+        return (
+          <CreateProject
+            onBack={handleBackNavigation}
+            onProjectCreated={(newProject) => {
+              // Optional: You can add logic here to navigate to the new project
+              console.log('New project created:', newProject);
+              // For example: handleProjectClick(newProject.id);
+            }}
           />
         );
 

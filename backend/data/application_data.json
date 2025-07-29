@@ -1,206 +1,262 @@
 {
-    "vendors": [
-      {
-        "id": 101,
-        "companyName": "SteelCorp",
-        "contactInfo": {
-          "representative": "Sarah Johnson",
-          "email": "sarah.johnson@steelcorp.com",
-          "phone": "(555) 123-4567",
-          "website": "https://steelcorp.com"
-        },
-        "specialties": ["Structural Steel", "Custom Fabrication"],
-        "address": {
-          "street": "1234 Industrial Blvd",
-          "city": "Pittsburgh",
-          "state": "PA",
-          "zipCode": "15201"
-        },
-        "notes": "Reliable delivery schedules, excellent communication",
-        "dateAdded": "2025-01-15",
-        "lastUpdated": "2025-01-20"
+  "vendors": [
+    {
+      "id": 101,
+      "companyName": "SteelCorp",
+      "contactInfo": {
+        "representative": "Sarah Johnson",
+        "email": "sarah.johnson@steelcorp.com",
+        "phone": "(555) 123-4567",
+        "website": "https://steelcorp.com"
       },
-      {
-        "id": 102,
-        "companyName": "Metropolitan Steel",
-        "contactInfo": {
-          "representative": "Mike Davis",
-          "email": "mike.davis@metrosteel.com",
-          "phone": "(555) 987-6543",
-          "website": "https://metrosteel.com"
-        },
-        "specialties": ["Structural Steel", "Steel Erection"],
-        "address": {
-          "street": "5678 Metro Ave",
-          "city": "Cleveland",
-          "state": "OH",
-          "zipCode": "44101"
-        },
-        "notes": "Competitive pricing, good for large projects",
-        "dateAdded": "2025-01-10",
-        "lastUpdated": "2025-01-15"
+      "specialties": [
+        "Structural Steel",
+        "Custom Fabrication"
+      ],
+      "address": {
+        "street": "1234 Industrial Blvd",
+        "city": "Pittsburgh",
+        "state": "PA",
+        "zipCode": "15201"
       },
-      {
-        "id": 103,
-        "companyName": "Industrial Supply Co",
-        "contactInfo": {
-          "representative": "Lisa Chen",
-          "email": "lisa.chen@industrialsupply.com",
-          "phone": "(555) 456-7890",
-          "website": "https://industrialsupply.com"
-        },
-        "specialties": ["Structural Steel", "Material Supply"],
-        "address": {
-          "street": "9012 Supply District",
-          "city": "Chicago",
-          "state": "IL",
-          "zipCode": "60601"
-        },
-        "notes": "Large inventory, fast shipping",
-        "dateAdded": "2025-01-08",
-        "lastUpdated": "2025-01-12"
-      }
-    ],
-    "projects": [
-      {
-        "id": 1,
-        "name": "Downtown Office Complex",
-        "client": "Metro Development Corp",
-        "startDate": "2025-06-01",
-        "bidDeadline": "2025-08-15",
-        "estimatedValue": 2850000,
-        "status": "active",
-        "description": "15-story mixed-use office complex with ground-floor retail space and underground parking",
-        "location": {
-          "address": "123 Downtown Ave",
-          "city": "Metro City",
-          "state": "NY",
-          "zipCode": "10001"
-        },
-        "clientContact": {
-          "name": "Sarah Johnson",
-          "email": "sarah.johnson@metrodev.com",
-          "phone": "(555) 123-4567"
-        },
-        "documentIds": [201, 202, 203],
-        "categoryIds": [301, 302, 303],
-        "createdDate": "2025-01-01",
-        "lastUpdated": "2025-01-25"
+      "notes": "Reliable delivery schedules, excellent communication",
+      "dateAdded": "2025-01-15",
+      "lastUpdated": "2025-01-20"
+    },
+    {
+      "id": 102,
+      "companyName": "Metropolitan Steel",
+      "contactInfo": {
+        "representative": "Mike Davis",
+        "email": "mike.davis@metrosteel.com",
+        "phone": "(555) 987-6543",
+        "website": "https://metrosteel.com"
       },
-      {
-        "id": 2,
-        "name": "Riverside Residential Phase 2",
-        "client": "Horizon Homes",
-        "startDate": "2025-07-01",
-        "bidDeadline": "2025-09-30",
-        "estimatedValue": 1650000,
-        "status": "early",
-        "description": "Multi-family residential development with community amenities",
-        "location": {
-          "address": "456 Riverside Dr",
-          "city": "Metro City",
-          "state": "NY",
-          "zipCode": "10002"
-        },
-        "clientContact": {
-          "name": "Michael Chen",
-          "email": "michael.chen@horizonhomes.com",
-          "phone": "(555) 987-1234"
-        },
-        "documentIds": [204, 205],
-        "categoryIds": [304, 305],
-        "createdDate": "2025-01-10",
-        "lastUpdated": "2025-01-22"
-      }
-    ],
-    "categories": [
-      {
-        "id": 301,
-        "projectId": 1,
-        "name": "Structural Steel",
-        "description": "Primary structural steel framework and support systems",
-        "totalItems": 12,
-        "quotedItems": 8,
-        "status": "in_progress",
-        "vendorParticipation": [
-          {
-            "vendorId": 101,
-            "bidAmount": 145000,
-            "bidStatus": "submitted",
-            "bidDate": "2025-01-20",
-            "notes": "Includes expedited delivery option"
-          },
-          {
-            "vendorId": 102,
-            "bidAmount": 162000,
-            "bidStatus": "submitted",
-            "bidDate": "2025-01-18",
-            "notes": "Standard delivery timeline"
-          },
-          {
-            "vendorId": 103,
-            "bidAmount": 178000,
-            "bidStatus": "submitted",
-            "bidDate": "2025-01-17",
-            "notes": "Bulk pricing available"
-          }
-        ],
-        "specifications": "Steel grade A992, all connections welded",
-        "estimatedValue": 150000,
-        "deadlineDate": "2025-02-01"
+      "specialties": [
+        "Structural Steel",
+        "Steel Erection"
+      ],
+      "address": {
+        "street": "5678 Metro Ave",
+        "city": "Cleveland",
+        "state": "OH",
+        "zipCode": "44101"
       },
-      {
-        "id": 302,
-        "projectId": 1,
-        "name": "Concrete & Masonry",
-        "description": "Foundation, structural concrete, and exterior masonry work",
-        "totalItems": 8,
-        "quotedItems": 8,
-        "status": "complete",
-        "vendorParticipation": [
-          {
-            "vendorId": 104,
-            "bidAmount": 89000,
-            "bidStatus": "submitted",
-            "bidDate": "2025-01-15",
-            "notes": "Includes premium finish options"
-          }
-        ],
-        "specifications": "5000 PSI concrete, brick matching architect specs",
-        "estimatedValue": 95000,
-        "deadlineDate": "2025-01-25"
-      }
-    ],
-    "documents": [
-      {
-        "id": 201,
-        "projectId": 1,
-        "filename": "architectural_plans.pdf",
-        "displayName": "Architectural Plans",
-        "fileType": "application/pdf",
-        "fileSize": 2456789,
-        "uploadDate": "2025-01-15",
-        "uploadedBy": "owner_rep_001",
-        "documentType": "plans",
-        "description": "Main architectural drawings for office complex",
-        "filePath": "/data/uploads/projects/1/architectural_plans.pdf",
-        "version": 1,
-        "tags": ["architecture", "plans", "primary"]
+      "notes": "Competitive pricing, good for large projects",
+      "dateAdded": "2025-01-10",
+      "lastUpdated": "2025-01-15"
+    },
+    {
+      "id": 103,
+      "companyName": "Industrial Supply Co",
+      "contactInfo": {
+        "representative": "Lisa Chen",
+        "email": "lisa.chen@industrialsupply.com",
+        "phone": "(555) 456-7890",
+        "website": "https://industrialsupply.com"
       },
-      {
-        "id": 202,
-        "projectId": 1,
-        "filename": "specifications.pdf",
-        "displayName": "Technical Specifications",
-        "fileType": "application/pdf",
-        "fileSize": 1234567,
-        "uploadDate": "2025-01-16",
-        "uploadedBy": "owner_rep_001",
-        "documentType": "specifications",
-        "description": "Detailed technical specifications and requirements",
-        "filePath": "/data/uploads/projects/1/specifications.pdf",
-        "version": 1,
-        "tags": ["specifications", "technical", "requirements"]
-      }
-    ]
-  }
+      "specialties": [
+        "Structural Steel",
+        "Material Supply"
+      ],
+      "address": {
+        "street": "9012 Supply District",
+        "city": "Chicago",
+        "state": "IL",
+        "zipCode": "60601"
+      },
+      "notes": "Large inventory, fast shipping",
+      "dateAdded": "2025-01-08",
+      "lastUpdated": "2025-01-12"
+    }
+  ],
+  "projects": [
+    {
+      "id": 1,
+      "name": "Downtown Office Complex",
+      "client": "Metro Development Corp",
+      "startDate": "2025-06-01",
+      "bidDeadline": "2025-08-15",
+      "estimatedValue": 2850000,
+      "status": "active",
+      "description": "15-story mixed-use office complex with ground-floor retail space and underground parking",
+      "location": {
+        "address": "123 Downtown Ave",
+        "city": "Metro City",
+        "state": "NY",
+        "zipCode": "10001"
+      },
+      "clientContact": {
+        "name": "Sarah Johnson",
+        "email": "sarah.johnson@metrodev.com",
+        "phone": "(555) 123-4567"
+      },
+      "documentIds": [
+        201,
+        202,
+        203
+      ],
+      "categoryIds": [
+        301,
+        302,
+        303
+      ],
+      "createdDate": "2025-01-01",
+      "lastUpdated": "2025-01-25"
+    },
+    {
+      "id": 2,
+      "name": "Riverside Residential Phase 2",
+      "client": "Horizon Homes",
+      "startDate": "2025-07-01",
+      "bidDeadline": "2025-09-30",
+      "estimatedValue": 1650000,
+      "status": "early",
+      "description": "Multi-family residential development with community amenities",
+      "location": {
+        "address": "456 Riverside Dr",
+        "city": "Metro City",
+        "state": "NY",
+        "zipCode": "10002"
+      },
+      "clientContact": {
+        "name": "Michael Chen",
+        "email": "michael.chen@horizonhomes.com",
+        "phone": "(555) 987-1234"
+      },
+      "documentIds": [
+        204,
+        205
+      ],
+      "categoryIds": [
+        304,
+        305
+      ],
+      "createdDate": "2025-01-10",
+      "lastUpdated": "2025-01-22"
+    },
+    {
+      "id": 3,
+      "name": "N Detroit Rebuild",
+      "client": "W Franz",
+      "startDate": "2025-07-01",
+      "bidDeadline": "2025-07-31",
+      "estimatedValue": 2500000.0,
+      "status": "early",
+      "description": "Single family home rebuild from scratch",
+      "location": {
+        "address": "1348 N Detroit St.",
+        "city": "Los Angeles",
+        "state": "CA",
+        "zipCode": "90005"
+      },
+      "clientContact": {
+        "name": "W Franz",
+        "email": "email@email.com",
+        "phone": "1112223333"
+      },
+      "documentIds": [],
+      "categoryIds": [],
+      "createdDate": "2025-07-29",
+      "lastUpdated": "2025-07-29"
+    }
+  ],
+  "categories": [
+    {
+      "id": 301,
+      "projectId": 1,
+      "name": "Structural Steel",
+      "description": "Primary structural steel framework and support systems",
+      "totalItems": 12,
+      "quotedItems": 8,
+      "status": "in_progress",
+      "vendorParticipation": [
+        {
+          "vendorId": 101,
+          "bidAmount": 145000,
+          "bidStatus": "submitted",
+          "bidDate": "2025-01-20",
+          "notes": "Includes expedited delivery option"
+        },
+        {
+          "vendorId": 102,
+          "bidAmount": 162000,
+          "bidStatus": "submitted",
+          "bidDate": "2025-01-18",
+          "notes": "Standard delivery timeline"
+        },
+        {
+          "vendorId": 103,
+          "bidAmount": 178000,
+          "bidStatus": "submitted",
+          "bidDate": "2025-01-17",
+          "notes": "Bulk pricing available"
+        }
+      ],
+      "specifications": "Steel grade A992, all connections welded",
+      "estimatedValue": 150000,
+      "deadlineDate": "2025-02-01"
+    },
+    {
+      "id": 302,
+      "projectId": 1,
+      "name": "Concrete & Masonry",
+      "description": "Foundation, structural concrete, and exterior masonry work",
+      "totalItems": 8,
+      "quotedItems": 8,
+      "status": "complete",
+      "vendorParticipation": [
+        {
+          "vendorId": 104,
+          "bidAmount": 89000,
+          "bidStatus": "submitted",
+          "bidDate": "2025-01-15",
+          "notes": "Includes premium finish options"
+        }
+      ],
+      "specifications": "5000 PSI concrete, brick matching architect specs",
+      "estimatedValue": 95000,
+      "deadlineDate": "2025-01-25"
+    }
+  ],
+  "documents": [
+    {
+      "id": 201,
+      "projectId": 1,
+      "filename": "architectural_plans.pdf",
+      "displayName": "Architectural Plans",
+      "fileType": "application/pdf",
+      "fileSize": 2456789,
+      "uploadDate": "2025-01-15",
+      "uploadedBy": "owner_rep_001",
+      "documentType": "plans",
+      "description": "Main architectural drawings for office complex",
+      "filePath": "/data/uploads/projects/1/architectural_plans.pdf",
+      "version": 1,
+      "tags": [
+        "architecture",
+        "plans",
+        "primary"
+      ]
+    },
+    {
+      "id": 202,
+      "projectId": 1,
+      "filename": "specifications.pdf",
+      "displayName": "Technical Specifications",
+      "fileType": "application/pdf",
+      "fileSize": 1234567,
+      "uploadDate": "2025-01-16",
+      "uploadedBy": "owner_rep_001",
+      "documentType": "specifications",
+      "description": "Detailed technical specifications and requirements",
+      "filePath": "/data/uploads/projects/1/specifications.pdf",
+      "version": 1,
+      "tags": [
+        "specifications",
+        "technical",
+        "requirements"
+      ]
+    }
+  ]
+}

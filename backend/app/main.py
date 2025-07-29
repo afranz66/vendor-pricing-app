@@ -307,5 +307,280 @@ async def contact_vendor(category_id: int, vendor_id: int, message: str):
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error contacting vendor: {str(e)}")
+    
+@app.post("/api/projects", response_model=Dict[str, Any])
+async def create_project(project_data: Dict[str, Any]):
+    """
+    Create a new project and add it to the system.
+    This is the main endpoint for adding new projects.
+    
+    Expected data:
+    {
+        "name": "Project Name",
+        "client": "Client Company",
+        "startDate": "2025-06-01",
+        "bidDeadline": "2025-08-15", 
+        "estimatedValue": 2500000,
+        "status": "early",
+        "description": "Project description",
+        "address": "123 Main St",
+        "city": "Metro City",
+        "state": "NY",
+        "zipCode": "10001",
+        "clientContactName": "John Doe",
+        "clientContactEmail": "john@company.com",
+        "clientContactPhone": "(555) 123-4567"
+    }
+    """
+    try:
+        # Validate required fields
+        required_fields = ["name", "client"]
+        missing_fields = [field for field in required_fields if not project_data.get(field)]
+        
+        if missing_fields:
+            raise HTTPException(
+                status_code=400, 
+                detail=f"Missing required fields: {', '.join(missing_fields)}"
+            )
+        
+        # Validate estimated value is a number
+        estimated_value = project_data.get("estimatedValue", 0)
+        try:
+            project_data["estimatedValue"] = float(estimated_value) if estimated_value else 0
+        except (ValueError, TypeError):
+            raise HTTPException(status_code=400, detail="estimatedValue must be a valid number")
+        
+        # Create the project
+        new_project = data_service.create_new_project(project_data)
+        
+        return {
+            "success": True,
+            "message": "Project created successfully",
+            "project": new_project,
+            "timestamp": datetime.now().isoformat()
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error creating project: {str(e)}")
+
+@app.put("/api/projects/{project_id}", response_model=Dict[str, Any])
+async def update_project(project_id: int, updates: Dict[str, Any]):
+    """
+    Update an existing project's information.
+    This allows editing project details after creation.
+    """
+    try:
+        # Validate estimated value if provided
+        if "estimatedValue" in updates:
+            try:
+                updates["estimatedValue"] = float(updates["estimatedValue"]) if updates["estimatedValue"] else 0
+            except (ValueError, TypeError):
+                raise HTTPException(status_code=400, detail="estimatedValue must be a valid number")
+        
+        success = data_service.update_project(project_id, updates)
+        
+        if not success:
+            raise HTTPException(status_code=404, detail="Project not found")
+        
+        return {
+            "success": True,
+            "message": f"Project {project_id} updated successfully",
+            "timestamp": datetime.now().isoformat()
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error updating project: {str(e)}")
+
+@app.delete("/api/projects/{project_id}")
+async def delete_project(project_id: int):
+    """
+    Delete a project and all its associated data.
+    This removes the project entirely from the system.
+    """
+    try:
+        success = data_service.delete_project(project_id)
+        
+        if not success:
+            raise HTTPException(status_code=404, detail="Project not found")
+        
+        return {
+            "success": True,
+            "message": f"Project {project_id} deleted successfully",
+            "timestamp": datetime.now().isoformat()
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error deleting project: {str(e)}")
+
+@app.post("/api/projects/{project_id}/categories", response_model=Dict[str, Any])
+async def add_category_to_project(project_id: int, category_data: Dict[str, Any]):
+    """
+    Add a new category to an existing project.
+    This builds out the project structure after creation.
+    
+    Expected data:
+    {
+        "name": "Category Name",
+        "description": "Category description", 
+        "totalItems": 10,
+        "specifications": "Technical specifications",
+        "estimatedValue": 150000,
+        "deadlineDate": "2025-02-01"
+    }
+    """
+    try:
+        # Validate required fields
+        if not category_data.get("name"):
+            raise HTTPException(status_code=400, detail="Category name is required")
+        
+        # Validate numeric fields
+        for field in ["totalItems", "estimatedValue"]:
+            if field in category_data:
+                try:
+                    category_data[field] = float(category_data[field]) if category_data[field] else 0
+                except (ValueError, TypeError):
+                    raise HTTPException(status_code=400, detail=f"{field} must be a valid number")
+        
+        new_category = data_service.add_category_to_project(project_id, category_data)
+        
+        return {
+            "success": True,
+            "message": "Category added successfully",
+            "category": new_category,
+            "timestamp": datetime.now().isoformat()
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error adding category: {str(e)}")
+
+@app.get("/api/project-templates", response_model=List[Dict[str, Any]])
+async def get_project_templates():
+    """
+    Get common project templates to speed up project creation.
+    This provides pre-filled templates for common project types.
+    """
+    try:
+        templates = data_service.get_project_templates()
+        return templates
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error retrieving templates: {str(e)}")
+
+@app.post("/api/projects/from-template", response_model=Dict[str, Any])
+async def create_project_from_template(request_data: Dict[str, Any]):
+    """
+    Create a new project using a template and custom data.
+    This speeds up project creation by starting with a template.
+    
+    Expected data:
+    {
+        "templateName": "Office Building",
+        "projectData": {
+            "name": "Downtown Office Complex",
+            "client": "Metro Development", 
+            // ... other project fields
+        },
+        "includeCategories": true
+    }
+    """
+    try:
+        template_name = request_data.get("templateName")
+        project_data = request_data.get("projectData", {})
+        include_categories = request_data.get("includeCategories", False)
+        
+        if not template_name:
+            raise HTTPException(status_code=400, detail="templateName is required")
+        
+        # Get template
+        templates = data_service.get_project_templates()
+        template = next((t for t in templates if t["name"] == template_name), None)
+        
+        if not template:
+            raise HTTPException(status_code=404, detail="Template not found")
+        
+        # Merge template data with provided data (provided data takes precedence)
+        merged_data = {
+            "description": template["description"],
+            "estimatedValue": template["estimatedValue"],
+            "status": template["status"],
+            **project_data  # User data overrides template
+        }
+        
+        # Validate required fields
+        if not merged_data.get("name") or not merged_data.get("client"):
+            raise HTTPException(status_code=400, detail="Project name and client are required")
+        
+        # Create the project
+        new_project = data_service.create_new_project(merged_data)
+        
+        # Add template categories if requested
+        created_categories = []
+        if include_categories and template.get("commonCategories"):
+            for category_template in template["commonCategories"]:
+                try:
+                    category = data_service.add_category_to_project(new_project["id"], category_template)
+                    created_categories.append(category)
+                except Exception as e:
+                    print(f"Warning: Failed to create category {category_template['name']}: {e}")
+        
+        return {
+            "success": True,
+            "message": "Project created from template successfully",
+            "project": new_project,
+            "categories": created_categories,
+            "template_used": template_name,
+            "timestamp": datetime.now().isoformat()
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error creating project from template: {str(e)}")
+
+# Simple test endpoint for project creation
+@app.post("/api/test-create-project")
+async def test_create_project():
+    """
+    Test endpoint to verify project creation works.
+    Creates a sample project for testing.
+    """
+    try:
+        test_project_data = {
+            "name": "Test Project " + datetime.now().strftime("%H:%M:%S"),
+            "client": "Test Client Corp",
+            "startDate": "2025-08-01",
+            "bidDeadline": "2025-09-15",
+            "estimatedValue": 1000000,
+            "status": "early",
+            "description": "Test project created via API",
+            "address": "123 Test St",
+            "city": "Test City",
+            "state": "TX",
+            "zipCode": "12345",
+            "clientContactName": "Test Contact",
+            "clientContactEmail": "test@testclient.com",
+            "clientContactPhone": "(555) 123-4567"
+        }
+        
+        new_project = data_service.create_new_project(test_project_data)
+        
+        return {
+            "success": True,
+            "message": "Test project created successfully",
+            "project": new_project,
+            "timestamp": datetime.now().isoformat()
+        }
+        
+    except Exception as e:
+        return {
+            "success": False,
+            "error": str(e),
+            "timestamp": datetime.now().isoformat()
+        }    
 # You can test your API by running: uvicorn app.main:app --reload
 # Then visit http://localhost:8000/docs to see the interactive API documentation
