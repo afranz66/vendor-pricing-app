@@ -1,18 +1,23 @@
-// src/components/projects/ProjectDashboard.js
-// Comprehensive project management interface that demonstrates advanced React patterns
+// frontend/src/components/projects/ProjectDashboard.js
+// Updated to include navigation to the new pages
 
 import React, { useState } from 'react';
 import { ArrowLeft, Calendar, Users, TrendingUp, AlertCircle, CheckCircle, Clock, DollarSign, Award, Eye, Settings } from 'lucide-react';
 import { useProjectDetails } from '../../hooks/useApi';
 
-const ProjectDashboard = ({ projectId, onCategoryClick, onVendorManagementClick, onBack }) => {
-  // State for managing which aspect of the project is currently emphasized
+const ProjectDashboard = ({ 
+  projectId, 
+  onBack, 
+  onQuoteComparisonClick, 
+  onVendorManagementClick 
+}) => {
   const [activeTab, setActiveTab] = useState('overview');
   
-  // Fetch comprehensive project data using our enhanced hook
+  // Fetch comprehensive project data using your existing hook
   const { project, categories, loading, error, refetch, hasCategories, hasVendors } = useProjectDetails(projectId);
 
-  // Display loading state with beautiful, consistent styling
+  // ... existing loading and error handling code stays the same ...
+
   if (loading) {
     return (
       <div className="max-w-7xl mx-auto p-8">
@@ -26,7 +31,6 @@ const ProjectDashboard = ({ projectId, onCategoryClick, onVendorManagementClick,
     );
   }
 
-  // Handle error states with actionable feedback and recovery options
   if (error || !project) {
     return (
       <div className="max-w-7xl mx-auto p-8">
@@ -36,16 +40,10 @@ const ProjectDashboard = ({ projectId, onCategoryClick, onVendorManagementClick,
             <h2 className="text-xl font-bold text-slate-800 mb-2">Unable to Load Project Details</h2>
             <p className="text-slate-600 mb-4">{error || 'Project not found'}</p>
             <div className="flex justify-center gap-4">
-              <button 
-                onClick={refetch}
-                className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white px-6 py-3 rounded-xl hover:from-blue-700 hover:to-indigo-800 transition-all duration-200 font-semibold"
-              >
+              <button onClick={refetch} className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white px-6 py-3 rounded-xl hover:from-blue-700 hover:to-indigo-800 transition-all duration-200 font-semibold">
                 Try Again
               </button>
-              <button 
-                onClick={onBack}
-                className="border-2 border-slate-300 text-slate-700 px-6 py-3 rounded-xl hover:bg-slate-50 hover:border-slate-400 transition-all duration-200 font-semibold"
-              >
+              <button onClick={onBack} className="border-2 border-slate-300 text-slate-700 px-6 py-3 rounded-xl hover:bg-slate-50 hover:border-slate-400 transition-all duration-200 font-semibold">
                 Back to Dashboard
               </button>
             </div>
@@ -55,36 +53,49 @@ const ProjectDashboard = ({ projectId, onCategoryClick, onVendorManagementClick,
     );
   }
 
-  // Helper function to determine the overall project status based on deadlines and progress
-  const getProjectStatus = () => {
-    const deadline = new Date(project.bidDeadline);
-    const today = new Date();
-    const daysUntilDeadline = Math.ceil((deadline - today) / (1000 * 60 * 60 * 24));
-    const completionPercentage = project.metrics ? project.metrics.completionPercentage : 0;
-    
-    if (project.status === 'complete') {
-      return { status: 'Complete', color: 'from-emerald-500 to-teal-600', icon: CheckCircle };
-    } else if (daysUntilDeadline < 7 && completionPercentage < 90) {
-      return { status: 'Urgent', color: 'from-red-500 to-rose-600', icon: AlertCircle };
-    } else if (completionPercentage >= 70) {
-      return { status: 'On Track', color: 'from-blue-500 to-indigo-600', icon: TrendingUp };
-    } else {
-      return { status: 'In Progress', color: 'from-amber-500 to-orange-600', icon: Clock };
-    }
+  // Helper functions for status and formatting
+  const getStatusStyling = (status) => {
+    const styles = {
+      in_progress: 'from-blue-500 to-indigo-600',
+      complete: 'from-green-500 to-emerald-600',
+      pending: 'from-yellow-500 to-orange-600'
+    };
+    return styles[status] || styles.pending;
   };
 
-  const projectStatus = getProjectStatus();
-  const StatusIcon = projectStatus.icon;
-  const deadline = new Date(project.bidDeadline);
-  const today = new Date();
-  const daysUntilDeadline = Math.ceil((deadline - today) / (1000 * 60 * 60 * 24));
+  const getStatusIcon = (status) => {
+    const icons = {
+      in_progress: <Clock size={16} />,
+      complete: <CheckCircle size={16} />,
+      pending: <Calendar size={16} />
+    };
+    return icons[status] || icons.pending;
+  };
+
+  const formatStatus = (status) => {
+    const labels = {
+      in_progress: 'In Progress',
+      complete: 'Complete',
+      pending: 'Pending'
+    };
+    return labels[status] || 'Unknown';
+  };
+
+  const formatCurrency = (amount) => {
+    if (!amount) return 'N/A';
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 0
+    }).format(amount);
+  };
 
   return (
-    <div className="max-w-7xl mx-auto p-8">
-      {/* Header Section with Navigation and Project Overview */}
-      <div className="mb-8">
-        <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-white/20">
-          <div className="flex items-center gap-6 mb-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+      <div className="max-w-7xl mx-auto p-8">
+        {/* Project Header */}
+        <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-8 shadow-2xl border border-white/30 mb-8">
+          <div className="flex items-center gap-6">
             <button 
               onClick={onBack}
               className="p-3 hover:bg-slate-100 rounded-2xl transition-all duration-200 hover:shadow-md"
@@ -96,218 +107,193 @@ const ProjectDashboard = ({ projectId, onCategoryClick, onVendorManagementClick,
                 {project.name}
               </h1>
               <p className="text-lg text-slate-600 font-medium">
-                {project.client} • Due: {deadline.toLocaleDateString()} 
-                {project.status !== 'complete' && (
-                  <span className={`ml-2 ${daysUntilDeadline < 7 ? 'text-red-600' : 'text-slate-600'}`}>
-                    ({daysUntilDeadline > 0 ? `${daysUntilDeadline} days remaining` : 'Overdue'})
-                  </span>
-                )}
+                {project.address}
               </p>
             </div>
-            <div className={`px-6 py-3 rounded-full text-sm font-bold flex items-center gap-2 bg-gradient-to-r ${projectStatus.color} text-white shadow-lg`}>
-              <StatusIcon size={18} />
-              {projectStatus.status}
-            </div>
-          </div>
-
-          {/* Project Quick Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="text-center p-4 bg-gradient-to-br from-slate-50 to-blue-50 rounded-2xl border border-slate-100">
-              <p className="text-2xl font-bold text-slate-800">
-                {project.metrics ? project.metrics.completionPercentage : 0}%
-              </p>
-              <p className="text-xs text-slate-600 font-medium">Overall Progress</p>
-            </div>
-            <div className="text-center p-4 bg-gradient-to-br from-slate-50 to-indigo-50 rounded-2xl border border-slate-100">
-              <p className="text-2xl font-bold text-slate-800">
-                {project.metrics ? `${project.metrics.quotedMaterials}/${project.metrics.totalMaterials}` : '0/0'}
-              </p>
-              <p className="text-xs text-slate-600 font-medium">Materials Quoted</p>
-            </div>
-            <div className="text-center p-4 bg-gradient-to-br from-slate-50 to-purple-50 rounded-2xl border border-slate-100">
-              <p className="text-2xl font-bold text-slate-800">
-                {project.metrics ? `${project.metrics.activeVendors}/${project.metrics.totalVendors}` : '0/0'}
-              </p>
-              <p className="text-xs text-slate-600 font-medium">Active Vendors</p>
-            </div>
-            <div className="text-center p-4 bg-gradient-to-br from-slate-50 to-emerald-50 rounded-2xl border border-slate-100">
-              <p className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
-                ${project.estimatedValue ? project.estimatedValue.toLocaleString() : '0'}
-              </p>
-              <p className="text-xs text-slate-600 font-medium">Project Value</p>
+            <div className="text-right">
+              <p className="text-sm text-slate-600 font-medium">Project Value</p>
+              <p className="text-3xl font-bold text-slate-800">{formatCurrency(project.estimatedValue)}</p>
+              <p className="text-green-600 font-semibold">{project.metrics?.completionPercentage || 0}% Complete</p>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Material Categories Section */}
-      {hasCategories && (
-        <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl border border-white/30 overflow-hidden mb-8">
-          <div className="bg-gradient-to-r from-slate-800 via-blue-900 to-indigo-900 p-6">
-            <h2 className="text-2xl font-bold text-white">Material Categories</h2>
-            <p className="text-slate-200">Click on any category to view detailed vendor comparisons and pricing analysis</p>
+        {/* Project Metrics */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/30">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
+                <TrendingUp className="w-5 h-5 text-blue-600" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-slate-800">
+                  {project.metrics ? `${project.metrics.quotedMaterials}/${project.metrics.totalMaterials}` : '0/0'}
+                </p>
+                <p className="text-sm text-slate-600 font-medium">Materials Quoted</p>
+              </div>
+            </div>
           </div>
           
-          <div className="p-8">
-            <div className="space-y-6">
-              {categories.map(category => {
-                const analysis = category.analysis;
-                
-                return (
-                  <div key={category.id} className="bg-gradient-to-br from-white to-slate-50 border-2 border-slate-200 rounded-2xl p-6 hover:shadow-lg transition-all duration-300 cursor-pointer group">
-                    <div className="flex justify-between items-start mb-4">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-4 mb-3">
-                          <h3 className="font-bold text-slate-800 text-lg group-hover:text-blue-700 transition-colors">
-                            {category.name}
-                          </h3>
-                          <span className={`px-4 py-2 rounded-full text-sm font-bold text-white flex items-center gap-2 bg-gradient-to-r ${getStatusStyling(category.status)} shadow-lg`}>
-                            {getStatusIcon(category.status)}
-                            {formatStatus(category.status)}
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/30">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
+                <Users className="w-5 h-5 text-green-600" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-slate-800">
+                  {project.metrics ? `${project.metrics.activeVendors}/${project.metrics.totalVendors}` : '0/0'}
+                </p>
+                <p className="text-sm text-slate-600 font-medium">Active Vendors</p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/30">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center">
+                <DollarSign className="w-5 h-5 text-purple-600" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-slate-800">{formatCurrency(project.estimatedValue)}</p>
+                <p className="text-sm text-slate-600 font-medium">Project Value</p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/30">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center">
+                <CheckCircle className="w-5 h-5 text-emerald-600" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-slate-800">{project.metrics?.completionPercentage || 0}%</p>
+                <p className="text-sm text-slate-600 font-medium">Complete</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Material Categories Section */}
+        {hasCategories && (
+          <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl border border-white/30 overflow-hidden mb-8">
+            <div className="bg-gradient-to-r from-slate-800 via-blue-900 to-indigo-900 p-6">
+              <h2 className="text-2xl font-bold text-white">Material Categories</h2>
+              <p className="text-slate-200">Click on any category to view detailed vendor comparisons and pricing analysis</p>
+            </div>
+            
+            <div className="p-8">
+              <div className="space-y-6">
+                {categories.map(category => {
+                  const analysis = category.analysis || {
+                    quotedVendors: 0,
+                    vendorCount: 0,
+                    completedItems: 0,
+                    totalItems: 0,
+                    bestQuote: null,
+                    estimatedSavings: 0,
+                    competitionLevel: "No Competition"
+                  };
+                  
+                  return (
+                    <div key={category.id} className="bg-gradient-to-br from-white to-slate-50 border-2 border-slate-200 rounded-2xl p-6 hover:shadow-lg transition-all duration-300 cursor-pointer group">
+                      <div className="flex justify-between items-start mb-4">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-4 mb-3">
+                            <h3 className="font-bold text-slate-800 text-lg group-hover:text-blue-700 transition-colors">
+                              {category.name}
+                            </h3>
+                            <span className={`px-4 py-2 rounded-full text-sm font-bold text-white flex items-center gap-2 bg-gradient-to-r ${getStatusStyling(category.status)} shadow-lg`}>
+                              {getStatusIcon(category.status)}
+                              {formatStatus(category.status)}
+                            </span>
+                          </div>
+                          <p className="text-sm text-slate-600 font-medium mb-2">
+                            {category.description}
+                          </p>
+                          <p className="text-sm text-slate-600">
+                            {analysis.quotedVendors}/{analysis.vendorCount} vendors quoted • 
+                            {analysis.completedItems}/{analysis.totalItems} items completed
+                          </p>
+                        </div>
+                        <div className="text-right ml-6">
+                          {analysis.bestQuote && (
+                            <>
+                              <p className="text-2xl font-bold text-slate-800">{formatCurrency(analysis.bestQuote)}</p>
+                              <p className="text-sm text-slate-600 font-medium">Best Quote</p>
+                              {analysis.estimatedSavings > 0 && (
+                                <p className="text-green-600 font-semibold">Save up to {formatCurrency(analysis.estimatedSavings)}</p>
+                              )}
+                            </>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Progress Bar */}
+                      <div className="mb-4">
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="text-sm font-semibold text-slate-700">
+                            {Math.round((analysis.completedItems / analysis.totalItems) * 100)}% complete
+                          </span>
+                          <span className={`text-sm font-bold px-3 py-1 rounded-full ${
+                            analysis.competitionLevel === 'High Competition' 
+                              ? 'bg-green-100 text-green-800' 
+                              : 'bg-gray-100 text-gray-800'
+                          }`}>
+                            {analysis.competitionLevel}
                           </span>
                         </div>
-                        <p className="text-sm text-slate-600 font-medium mb-2">
-                          {category.description}
-                        </p>
-                        <p className="text-sm text-slate-600">
-                          {analysis.quotedVendors}/{analysis.vendorCount} vendors quoted • 
-                          {analysis.quotedItems}/{category.totalItems} items completed
-                        </p>
+                        <div className="w-full bg-slate-200 rounded-full h-3 overflow-hidden">
+                          <div 
+                            className={`h-full bg-gradient-to-r ${
+                              category.status === 'complete' ? 'from-green-500 to-emerald-600' : 'from-orange-400 to-yellow-500'
+                            } transition-all duration-1000 ease-out`}
+                            style={{ width: `${(analysis.completedItems / analysis.totalItems) * 100}%` }}
+                          ></div>
+                        </div>
                       </div>
-                      <div className="text-right">
-                        {analysis.bidding.lowestBid && (
-                          <div>
-                            <p className="text-2xl font-bold text-slate-800">
-                              ${analysis.bidding.lowestBid.toLocaleString()}
-                            </p>
-                            <p className="text-sm text-slate-600 font-medium">Best Quote</p>
-                            {analysis.bidding.potentialSavings > 0 && (
-                              <p className="text-sm font-semibold text-emerald-600">
-                                Save up to ${analysis.bidding.potentialSavings.toLocaleString()}
-                              </p>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    
-                    {/* Progress Bar */}
-                    <div className="w-full bg-slate-200 rounded-full h-4 mb-4 shadow-inner">
-                      <div 
-                        className={`h-4 rounded-full transition-all duration-500 bg-gradient-to-r ${getProgressBarColor(category.status, analysis.completionPercentage)} shadow-sm`}
-                        style={{ width: `${analysis.completionPercentage}%` }}
-                      ></div>
-                    </div>
-                    
-                    {/* Action Buttons */}
-                    <div className="flex justify-between items-center">
-                      <div className="flex items-center gap-4">
-                        <span className="text-sm font-semibold text-slate-600">
-                          {analysis.completionPercentage}% complete
-                        </span>
-                        <span className={`text-sm font-semibold px-3 py-1 rounded-full ${getCompetitivenessStyle(analysis.bidding.competitivenessScore)}`}>
-                          {analysis.bidding.competitivenessScore} Competition
-                        </span>
-                      </div>
-                      <div className="flex gap-3">
+
+                      {/* Action Buttons - Updated to use the navigation props */}
+                      <div className="flex justify-end gap-3">
                         <button 
                           onClick={(e) => {
                             e.stopPropagation();
-                            if (onVendorManagementClick) onVendorManagementClick(category.id);
+                            onVendorManagementClick(category.id);
                           }}
-                          className="text-blue-600 hover:text-blue-700 font-bold text-sm hover:underline transition-all duration-200 flex items-center gap-2"
+                          className="flex items-center gap-2 px-4 py-2 text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-xl transition-all duration-200 font-semibold hover:shadow-md"
                         >
                           <Settings size={16} />
                           Manage Vendors
                         </button>
                         <button 
-                          onClick={() => {
-                            if (onCategoryClick) onCategoryClick(category.id);
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onQuoteComparisonClick(category.id);
                           }}
-                          className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:from-blue-700 hover:to-indigo-800 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center gap-2"
+                          className="flex items-center gap-2 px-4 py-2 text-white bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 rounded-xl transition-all duration-200 font-semibold shadow-lg hover:shadow-xl"
                         >
                           <Eye size={16} />
                           Compare Quotes
                         </button>
                       </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Project Information Section */}
-      <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl border border-white/30 p-8">
-        <h3 className="text-xl font-bold text-slate-800 mb-6">Project Information</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <h4 className="font-semibold text-slate-700 mb-3">Project Details</h4>
-            <div className="space-y-2 text-sm">
-              <p><span className="text-slate-600">Description:</span> <span className="text-slate-800">{project.description}</span></p>
-              <p><span className="text-slate-600">Start Date:</span> <span className="text-slate-800">{new Date(project.startDate).toLocaleDateString()}</span></p>
-              <p><span className="text-slate-600">Bid Deadline:</span> <span className="text-slate-800">{deadline.toLocaleDateString()}</span></p>
-              <p><span className="text-slate-600">Status:</span> <span className="text-slate-800">{project.status}</span></p>
-            </div>
+        {/* Show message if no categories */}
+        {!hasCategories && (
+          <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border border-white/30 p-12 text-center">
+            <Calendar className="w-16 h-16 text-slate-400 mx-auto mb-4" />
+            <h3 className="text-xl font-bold text-slate-800 mb-2">No Material Categories Yet</h3>
+            <p className="text-slate-600">Categories and vendor information will appear here as they're added to the project.</p>
           </div>
-          <div>
-            <h4 className="font-semibold text-slate-700 mb-3">Client Contact</h4>
-            <div className="space-y-2 text-sm">
-              <p><span className="text-slate-600">Name:</span> <span className="text-slate-800">{project.clientContact?.name}</span></p>
-              <p><span className="text-slate-600">Email:</span> 
-                <a href={`mailto:${project.clientContact?.email}`} className="text-blue-600 hover:text-blue-700 underline ml-1">
-                  {project.clientContact?.email}
-                </a>
-              </p>
-              <p><span className="text-slate-600">Phone:</span> 
-                <a href={`tel:${project.clientContact?.phone}`} className="text-blue-600 hover:text-blue-700 underline ml-1">
-                  {project.clientContact?.phone}
-                </a>
-              </p>
-            </div>
-          </div>
-        </div>
+        )}
       </div>
     </div>
   );
-};
-
-// Helper functions for styling and status management
-const getStatusStyling = (status) => {
-  switch (status) {
-    case 'complete': return 'from-emerald-500 to-teal-600';
-    case 'in_progress': return 'from-blue-500 to-indigo-600';
-    case 'early': return 'from-amber-500 to-orange-600';
-    default: return 'from-slate-400 to-gray-500';
-  }
-};
-
-const getStatusIcon = (status) => {
-  switch (status) {
-    case 'complete': return <CheckCircle size={16} />;
-    case 'urgent': return <AlertCircle size={16} />;
-    default: return <Clock size={16} />;
-  }
-};
-
-const formatStatus = (status) => {
-  return status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
-};
-
-const getProgressBarColor = (status, percentage) => {
-  if (status === 'complete') return 'from-emerald-500 to-teal-500';
-  if (percentage >= 70) return 'from-blue-500 to-indigo-500';
-  return 'from-amber-500 to-orange-500';
-};
-
-const getCompetitivenessStyle = (score) => {
-  switch (score) {
-    case 'High': return 'bg-emerald-100 text-emerald-700';
-    case 'Low': return 'bg-amber-100 text-amber-700';
-    default: return 'bg-slate-100 text-slate-700';
-  }
 };
 
 export default ProjectDashboard;
