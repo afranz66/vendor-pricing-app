@@ -33,8 +33,7 @@ const Dashboard = ({ onProjectClick, onCreateProjectClick }) => {
   const portfolioMetrics = {
     totalProjects: projects.length,
     activeProjects: projects.filter(p => p.status === 'active' || p.status === 'early').length,
-    completedProjects: projects.filter(p => p.status === 'complete').length,
-    totalValue: projects.reduce((sum, p) => sum + p.estimatedValue, 0)
+    completedProjects: projects.filter(p => p.status === 'complete').length
   };
 
   return (
@@ -45,7 +44,7 @@ const Dashboard = ({ onProjectClick, onCreateProjectClick }) => {
           <div className="flex justify-between items-center">
             <div>
               <h1 className="text-4xl font-bold bg-gradient-to-r from-slate-800 via-blue-900 to-indigo-900 bg-clip-text text-transparent mb-3">
-                Construction Bidding Dashboard
+                Vendor Management Dashboard
               </h1>
               <p className="text-lg text-slate-600 font-medium">
                 Manage your projects and track bidding progress across all active jobs
@@ -63,7 +62,7 @@ const Dashboard = ({ onProjectClick, onCreateProjectClick }) => {
       </div>
 
       {/* Portfolio Metrics Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
         <MetricCard
           title="Total Projects"
           value={portfolioMetrics.totalProjects}
@@ -87,15 +86,6 @@ const Dashboard = ({ onProjectClick, onCreateProjectClick }) => {
           icon={CheckCircle}
           color="from-emerald-100 to-teal-100"
           iconColor="text-emerald-600"
-        />
-        <MetricCard
-          title="Total Value"
-          value={`$${(portfolioMetrics.totalValue / 1000000).toFixed(1)}M`}
-          subtitle="Portfolio value"
-          icon={TrendingUp}
-          color="from-purple-100 to-pink-100"
-          iconColor="text-purple-600"
-          valueStyle="bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent"
         />
       </div>
 

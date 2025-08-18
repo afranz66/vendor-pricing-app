@@ -95,7 +95,7 @@ const ProjectSummaryCard = ({ project, onClick }) => {
         {/* Progress Section */}
         <div className="mb-6">
           <div className="flex justify-between text-sm font-semibold text-slate-700 mb-3">
-            <span>Bidding Progress</span>
+            <span>Progress:</span>
             <span>{metrics.completionPercentage}% Complete</span>
           </div>
           <div className="w-full bg-slate-200 rounded-full h-3 shadow-inner">
@@ -125,13 +125,13 @@ const ProjectSummaryCard = ({ project, onClick }) => {
         {/* Project Information */}
         <div className="space-y-3 text-sm mb-6">
           <div className="flex justify-between items-center">
-            <span className="text-slate-600 font-medium">Estimated Value:</span>
+            <span className="text-slate-600 font-medium">Total Savings:</span>
             <span className="font-bold text-slate-800 text-lg">
               ${project.estimatedValue.toLocaleString()}
             </span>
           </div>
           <div className="flex justify-between items-center">
-            <span className="text-slate-600 font-medium">Bid Deadline:</span>
+            <span className="text-slate-600 font-medium">Next Deadline</span>
             <span className={`font-bold ${daysUntilDeadline < 7 ? 'text-red-600' : 'text-slate-800'}`}>
               {deadline.toLocaleDateString()} 
               {project.status !== 'complete' && (

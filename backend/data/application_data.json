@@ -75,6 +75,7 @@
       "id": 1,
       "name": "Downtown Office Complex",
       "client": "Metro Development Corp",
+      "generalcontractor": "WF Construction",
       "startDate": "2025-06-01",
       "bidDeadline": "2025-08-15",
       "estimatedValue": 2850000,
@@ -90,6 +91,11 @@
         "name": "Sarah Johnson",
         "email": "sarah.johnson@metrodev.com",
         "phone": "(555) 123-4567"
+      },
+      "gcContact": {
+        "name": "William Franz",
+        "email": "aaa@hwfr.com",
+        "phone": "(999) 999-9999"
       },
       "documentIds": [
         201,
@@ -108,6 +114,7 @@
       "id": 2,
       "name": "Riverside Residential Phase 2",
       "client": "Horizon Homes",
+      "generalcontractor": "WF Construction",
       "startDate": "2025-07-01",
       "bidDeadline": "2025-09-30",
       "estimatedValue": 1650000,
@@ -124,6 +131,11 @@
         "email": "michael.chen@horizonhomes.com",
         "phone": "(555) 987-1234"
       },
+      "gcContact": {
+        "name": "William Franz",
+        "email": "aaa@hwfr.com",
+        "phone": "(999) 999-9999"
+      },
       "documentIds": [
         204,
         205
@@ -139,6 +151,7 @@
       "id": 3,
       "name": "N Detroit Rebuild",
       "client": "W Franz",
+      "generalcontractor":"WF Construction",
       "startDate": "2025-07-01",
       "bidDeadline": "2025-07-31",
       "estimatedValue": 2500000.0,
@@ -154,6 +167,11 @@
         "name": "W Franz",
         "email": "email@email.com",
         "phone": "1112223333"
+      },
+      "gcContact": {
+        "name": "William Franz",
+        "email": "aaa@hwfr.com",
+        "phone": "(999) 999-9999"
       },
       "documentIds": [],
       "categoryIds": [],
