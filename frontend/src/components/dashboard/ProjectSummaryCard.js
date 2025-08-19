@@ -131,7 +131,7 @@ const ProjectSummaryCard = ({ project, onClick }) => {
             </span>
           </div>
           <div className="flex justify-between items-center">
-            <span className="text-slate-600 font-medium">Next Deadline</span>
+            <span className="text-slate-600 font-medium">Next Deadline:</span>
             <span className={`font-bold ${daysUntilDeadline < 7 ? 'text-red-600' : 'text-slate-800'}`}>
               {deadline.toLocaleDateString()} 
               {project.status !== 'complete' && (

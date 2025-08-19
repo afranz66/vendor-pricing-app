@@ -44,7 +44,7 @@ const Dashboard = ({ onProjectClick, onCreateProjectClick }) => {
           <div className="flex justify-between items-center">
             <div>
               <h1 className="text-4xl font-bold bg-gradient-to-r from-slate-800 via-blue-900 to-indigo-900 bg-clip-text text-transparent mb-3">
-                Vendor Management Dashboard
+                Altadena Collective/Brass Tacks Vendor Management
               </h1>
               <p className="text-lg text-slate-600 font-medium">
                 Manage your projects and track bidding progress across all active jobs

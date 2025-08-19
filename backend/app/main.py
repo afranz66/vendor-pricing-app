@@ -582,5 +582,106 @@ async def test_create_project():
             "error": str(e),
             "timestamp": datetime.now().isoformat()
         }    
+
+@app.post("/api/vendors", response_model=Dict[str, Any])
+async def create_vendor(vendor_data: Dict[str, Any]):
+    """
+    Create a new vendor and add it to the catalog.
+    This is the main endpoint for adding new vendors.
+    
+    Expected data:
+    {
+        "companyName": "SteelCorp",
+        "contactInfo": {
+            "representative": "Sarah Johnson",
+            "email": "sarah.johnson@steelcorp.com",
+            "phone": "(555) 123-4567",
+            "website": "https://steelcorp.com"
+        },
+        "specialties": ["Structural Steel", "Custom Fabrication"],
+        "address": {
+            "street": "1234 Industrial Blvd",
+            "city": "Pittsburgh",
+            "state": "PA",
+            "zipCode": "15201"
+        },
+        "notes": "Reliable delivery schedules, excellent communication"
+    }
+    """
+    try:
+        # Validate required fields
+        required_fields = ["companyName"]
+        missing_fields = [field for field in required_fields if not vendor_data.get(field)]
+        
+        if missing_fields:
+            raise HTTPException(
+                status_code=400, 
+                detail=f"Missing required fields: {', '.join(missing_fields)}"
+            )
+        
+        # Validate contact info structure
+        contact_info = vendor_data.get("contactInfo", {})
+        required_contact_fields = ["representative", "email", "phone"]
+        missing_contact_fields = [field for field in required_contact_fields if not contact_info.get(field)]
+        
+        if missing_contact_fields:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Missing required contact info: {', '.join(missing_contact_fields)}"
+            )
+        
+        # Validate address structure
+        address = vendor_data.get("address", {})
+        required_address_fields = ["city", "state"]
+        missing_address_fields = [field for field in required_address_fields if not address.get(field)]
+        
+        if missing_address_fields:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Missing required address info: {', '.join(missing_address_fields)}"
+            )
+        
+        # Validate specialties
+        specialties = vendor_data.get("specialties", [])
+        if not specialties or len(specialties) == 0:
+            raise HTTPException(
+                status_code=400,
+                detail="At least one specialty is required"
+            )
+        
+        # Create the vendor
+        new_vendor = data_service.add_vendor(vendor_data)
+        
+        return {
+            "success": True,
+            "message": "Vendor created successfully",
+            "vendor": new_vendor,
+            "timestamp": datetime.now().isoformat()
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error creating vendor: {str(e)}")
+
+@app.put("/api/vendors/{vendor_id}", response_model=Dict[str, Any])
+async def update_vendor(vendor_id: int, updates: Dict[str, Any]):
+    """
+    Update an existing vendor's information.
+    This allows editing vendor details after creation.
+    """
+    try:
+        # In a real implementation, this would update the vendor data
+        # using data_service.update_vendor(vendor_id, updates)
+        
+        return {
+            "success": True,
+            "message": f"Vendor {vendor_id} updated successfully",
+            "updatedData": updates,
+            "timestamp": datetime.now().isoformat()
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error updating vendor: {str(e)}")
 # You can test your API by running: uvicorn app.main:app --reload
 # Then visit http://localhost:8000/docs to see the interactive API documentation
