@@ -24,6 +24,7 @@ import ManageVendors from './components/vendors/ManageVendors';
 import VendorCatalog from './components/vendors/VendorCatalog';
 import CreateVendor from './components/vendors/CreateVendor';
 import CreateProject from './components/projects/CreateProject';
+import GCDetailsPage from './components/contractors/GCDetailsPage';
 import LoadingCard from './components/shared/LoadingCard';
 import ErrorCard from './components/shared/ErrorCard';
 
@@ -36,6 +37,7 @@ function App() {
   const [navigationState, setNavigationState] = useState({
     selectedProjectId: null,
     selectedCategoryId: null,
+    selectedProject: null,
     previousView: null
   });
 
@@ -55,6 +57,7 @@ function App() {
     setNavigationState({
       selectedProjectId: projectId,
       selectedCategoryId: null,
+      selectedProject: null,
       previousView: currentView === 'projects' ? 'projects' : 'dashboard'
     });
     setCurrentView('project');
@@ -95,6 +98,16 @@ function App() {
     setCurrentView('create-vendor');
   };
 
+  const handleGCClick = (project) => {
+    setNavigationState(prevState => ({
+      ...prevState,
+      selectedProject: project,
+      previousView: currentView
+    }));
+    setCurrentView('gc-details');
+    setSidebarOpen(false);
+  };
+
   const handleBackNavigation = () => {
     const { previousView } = navigationState;
     
@@ -104,6 +117,7 @@ function App() {
         setNavigationState({
           selectedProjectId: null,
           selectedCategoryId: null,
+          selectedProject: null,
           previousView: null
         });
         break;
@@ -118,14 +132,37 @@ function App() {
         break;
       case 'create-project':
         setCurrentView(previousView || 'dashboard');
+        setNavigationState(prevState => ({
+          ...prevState,
+          selectedProject: null,
+          previousView: null
+        }));
         break;
       case 'create-vendor':
         setCurrentView(previousView || 'vendors');
+        setNavigationState(prevState => ({
+          ...prevState,
+          selectedProject: null,
+          previousView: null
+        }));
+        break;
+      case 'gc-details':
+        setCurrentView(previousView || 'dashboard');
+        setNavigationState(prevState => ({
+          ...prevState,
+          selectedProject: null,
+          previousView: null
+        }));
         break;
       default:
         if (previousView) {
           setCurrentView(previousView);
         }
+        setNavigationState(prevState => ({
+          ...prevState,
+          selectedProject: null,
+          previousView: null
+        }));
     }
   };
 
@@ -140,6 +177,7 @@ function App() {
       setNavigationState({
         selectedProjectId: null,
         selectedCategoryId: null,
+        selectedProject: null,
         previousView: null
       });
     }
@@ -152,6 +190,7 @@ function App() {
     setNavigationState({
       selectedProjectId: null,
       selectedCategoryId: null,
+      selectedProject: null,
       previousView: null
     });
   };
@@ -163,6 +202,7 @@ function App() {
           <Dashboard 
             onProjectClick={handleProjectClick}
             onCreateProjectClick={handleCreateProjectClick}
+            onGCClick={handleGCClick}
           />
         );
       
@@ -210,6 +250,14 @@ function App() {
           />
         );
 
+      case 'gc-details':
+        return (
+          <GCDetailsPage
+            project={navigationState.selectedProject}
+            onBack={handleBackNavigation}
+          />
+        );
+
       case 'projects':
         return (
           <div className="max-w-7xl mx-auto p-8">
@@ -237,6 +285,7 @@ function App() {
             <Dashboard 
               onProjectClick={handleProjectClick}
               onCreateProjectClick={handleCreateProjectClick}
+              onGCClick={handleGCClick}
             />
           </div>
         );
@@ -299,6 +348,7 @@ function App() {
           <Dashboard 
             onProjectClick={handleProjectClick}
             onCreateProjectClick={handleCreateProjectClick}
+            onGCClick={handleGCClick}
           />
         );
     }
@@ -342,6 +392,12 @@ function App() {
         breadcrumbs.push(
           { label: 'Vendors', onClick: () => setCurrentView('vendors') },
           { label: 'Add Vendor', active: true }
+        );
+        break;
+      case 'gc-details':
+        breadcrumbs.push(
+          { label: 'Dashboard', onClick: () => setCurrentView('dashboard') },
+          { label: 'Contractor Details', active: true }
         );
         break;
       default:
@@ -412,7 +468,7 @@ function App() {
               <nav className="hidden md:flex items-center text-sm text-slate-600">
                 {getBreadcrumbs().map((crumb, index) => (
                   <React.Fragment key={index}>
-                    {index > 0 && <span className="mx-2 text-slate-400"></span>}
+                    {index > 0 && <span className="mx-2 text-slate-400">→</span>}
                     {crumb.active ? (
                       <span className="text-slate-800 font-medium">{crumb.label}</span>
                     ) : (
@@ -462,7 +518,7 @@ function App() {
               {navigationItems.map(item => {
                 const Icon = item.icon;
                 const isActive = currentView === item.id || 
-                  (item.id === 'dashboard' && ['project', 'quote-comparison', 'vendor-management', 'create-project'].includes(currentView));
+                  (item.id === 'dashboard' && ['project', 'quote-comparison', 'vendor-management', 'create-project', 'gc-details'].includes(currentView));
                 
                 return (
                   <li key={item.id}>
@@ -475,6 +531,7 @@ function App() {
                           setNavigationState({
                             selectedProjectId: null,
                             selectedCategoryId: null,
+                            selectedProject: null,
                             previousView: null
                           });
                         }

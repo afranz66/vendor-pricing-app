@@ -9,7 +9,7 @@ import ErrorCard from '../shared/ErrorCard';
 import ProjectSummaryCard from './ProjectSummaryCard';
 import MetricCard from './MetricCard';
 
-const Dashboard = ({ onProjectClick, onCreateProjectClick }) => {
+const Dashboard = ({ onProjectClick, onCreateProjectClick, onGCClick }) => {
   // Fetch projects data using our custom hook
   const { projects, loading, error, refetchProjects } = useProjects();
 
@@ -44,7 +44,7 @@ const Dashboard = ({ onProjectClick, onCreateProjectClick }) => {
           <div className="flex justify-between items-center">
             <div>
               <h1 className="text-4xl font-bold bg-gradient-to-r from-slate-800 via-blue-900 to-indigo-900 bg-clip-text text-transparent mb-3">
-                Altadena Collective/Brass Tacks Vendor Management
+                Vendor Management Dashboard
               </h1>
               <p className="text-lg text-slate-600 font-medium">
                 Manage your projects and track bidding progress across all active jobs
@@ -96,6 +96,7 @@ const Dashboard = ({ onProjectClick, onCreateProjectClick }) => {
             key={project.id}
             project={project}
             onClick={() => onProjectClick(project.id)}
+            onGCClick={onGCClick}
           />
         ))}
       </div>

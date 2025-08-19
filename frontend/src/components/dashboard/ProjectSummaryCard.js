@@ -1,10 +1,10 @@
 // frontend/src/components/dashboard/ProjectSummaryCard.js
-// Individual project card for dashboard display
+// Individual project card for dashboard display with GC information
 
 import React from 'react';
-import { CheckCircle, AlertCircle, Clock, TrendingUp } from 'lucide-react';
+import { CheckCircle, AlertCircle, Clock, TrendingUp, Building2, User } from 'lucide-react';
 
-const ProjectSummaryCard = ({ project, onClick }) => {
+const ProjectSummaryCard = ({ project, onClick, onGCClick }) => {
   // Extract metrics from the backend-provided data
   const metrics = project.metrics || {
     totalMaterials: 0,
@@ -57,45 +57,86 @@ const ProjectSummaryCard = ({ project, onClick }) => {
     const today = new Date();
     const daysUntilDeadline = Math.ceil((deadline - today) / (1000 * 60 * 60 * 24));
     
-    if (project.status === 'complete') return 'from-emerald-500 to-teal-500';
-    if (daysUntilDeadline < 7 && metrics.completionPercentage < 90) return 'from-red-500 to-rose-500';
-    if (metrics.completionPercentage >= 70) return 'from-blue-500 to-indigo-500';
-    return 'from-amber-500 to-orange-500';
+    if (project.status === 'complete') {
+      return 'from-emerald-400 to-teal-500';
+    } else if (daysUntilDeadline < 7 && metrics.completionPercentage < 90) {
+      return 'from-red-400 to-rose-500';
+    } else if (metrics.completionPercentage < 50) {
+      return 'from-amber-400 to-orange-500';
+    } else {
+      return 'from-blue-400 to-indigo-500';
+    }
   };
 
   const statusInfo = getStatusInfo();
-  const StatusIcon = statusInfo.icon;
   const deadline = new Date(project.bidDeadline);
   const today = new Date();
   const daysUntilDeadline = Math.ceil((deadline - today) / (1000 * 60 * 60 * 24));
+  const StatusIcon = statusInfo.icon;
 
   return (
     <div 
-      className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer border border-white/30 overflow-hidden group"
+      className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border border-white/30 p-8 hover:shadow-lg transition-all duration-200 cursor-pointer hover:bg-white/90"
       onClick={onClick}
     >
-      {/* Project Header with Status */}
-      <div className={`bg-gradient-to-r ${statusInfo.bgColor} p-6 border-b border-white/20`}>
-        <div className="flex justify-between items-start mb-4">
+      <div className="space-y-6">
+        {/* Project Header */}
+        <div className="flex justify-between items-start">
           <div className="flex-1">
-            <h3 className="text-xl font-bold text-slate-800 mb-2 group-hover:text-slate-900 transition-colors">
+            <h3 className="text-xl font-bold text-slate-800 mb-2 leading-tight">
               {project.name}
             </h3>
-            <p className="text-slate-600 font-medium">{project.client}</p>
+            <p className="text-slate-600 text-sm leading-relaxed">
+              {project.description}
+            </p>
           </div>
-          <div className={`px-4 py-2 rounded-full text-sm font-bold flex items-center gap-2 bg-gradient-to-r ${statusInfo.color} text-white shadow-lg`}>
+          <div className={`flex items-center gap-2 px-4 py-2 rounded-2xl text-sm font-bold text-white bg-gradient-to-r ${statusInfo.color} shadow-lg`}>
             <StatusIcon size={16} />
             {statusInfo.label}
           </div>
         </div>
-      </div>
 
-      {/* Project Details */}
-      <div className="p-6">
-        {/* Progress Section */}
-        <div className="mb-6">
-          <div className="flex justify-between text-sm font-semibold text-slate-700 mb-3">
-            <span>Progress:</span>
+        {/* Client and General Contractor Information */}
+        <div className="grid grid-cols-1 gap-4">
+          {/* Client Info */}
+          <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-slate-50 to-blue-50 rounded-2xl border border-slate-100">
+            <User size={16} className="text-blue-600" />
+            <div className="flex-1">
+              <p className="text-xs text-slate-600 font-medium">Client</p>
+              <p className="text-sm font-bold text-slate-800">{project.client}</p>
+            </div>
+          </div>
+          
+          {/* General Contractor Info - Clickable Button */}
+          {project.generalcontractor && (
+            <button 
+              className="flex items-center gap-3 p-3 bg-gradient-to-r from-slate-50 to-green-50 rounded-2xl border border-slate-100 hover:from-green-50 hover:to-green-100 hover:border-green-200 transition-all duration-200 w-full text-left hover:shadow-md"
+              onClick={(e) => {
+                e.stopPropagation();
+                if (onGCClick) {
+                  onGCClick(project);
+                }
+              }}
+            >
+              <Building2 size={16} className="text-green-600" />
+              <div className="flex-1">
+                <p className="text-xs text-slate-600 font-medium">General Contractor</p>
+                <p className="text-sm font-bold text-slate-800">{project.generalcontractor}</p>
+                {project.gcContact && project.gcContact.name && (
+                  <p className="text-xs text-slate-500">{project.gcContact.name}</p>
+                )}
+              </div>
+              <div className="text-xs text-green-600 font-medium">
+                View details →
+              </div>
+            </button>
+          )}
+        </div>
+
+        {/* Progress Tracking */}
+        <div className="space-y-3">
+          <div className="flex justify-between items-center">
+            <span className="text-sm font-semibold text-slate-700">Progress</span>
             <span>{metrics.completionPercentage}% Complete</span>
           </div>
           <div className="w-full bg-slate-200 rounded-full h-3 shadow-inner">
@@ -125,13 +166,13 @@ const ProjectSummaryCard = ({ project, onClick }) => {
         {/* Project Information */}
         <div className="space-y-3 text-sm mb-6">
           <div className="flex justify-between items-center">
-            <span className="text-slate-600 font-medium">Total Savings:</span>
+            <span className="text-slate-600 font-medium">Total Value:</span>
             <span className="font-bold text-slate-800 text-lg">
               ${project.estimatedValue.toLocaleString()}
             </span>
           </div>
           <div className="flex justify-between items-center">
-            <span className="text-slate-600 font-medium">Next Deadline:</span>
+            <span className="text-slate-600 font-medium">Next Deadline</span>
             <span className={`font-bold ${daysUntilDeadline < 7 ? 'text-red-600' : 'text-slate-800'}`}>
               {deadline.toLocaleDateString()} 
               {project.status !== 'complete' && (
@@ -145,7 +186,7 @@ const ProjectSummaryCard = ({ project, onClick }) => {
 
         {/* Action Button */}
         <div className="pt-4 border-t border-slate-200">
-          <button className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white py-3 px-4 rounded-xl text-sm font-semibold hover:from-blue-600 hover:to-indigo-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105">
+          <button className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white py-3 px-4 rounded-xl text-sm font-semibold hover:from-blue-600 hover:to-indigo-700 transition-all duration-200 shadow-lg hover:shadow-xl">
             View Project Details →
           </button>
         </div>
