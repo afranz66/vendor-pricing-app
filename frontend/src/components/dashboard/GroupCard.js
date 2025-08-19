@@ -86,26 +86,7 @@ const GroupCard = ({ group, onClick }) => {
           </p>
         </div>
 
-        {/* Group Details Grid */}
-        <div className="grid grid-cols-2 gap-4">
-          {/* Client */}
-          <div className="flex items-center gap-2 p-3 bg-gradient-to-r from-slate-50 to-blue-50 rounded-xl border border-slate-100">
-            <Users size={16} className="text-blue-600" />
-            <div>
-              <p className="text-xs text-slate-500 font-medium">Client</p>
-              <p className="text-sm font-bold text-slate-800">{group.client}</p>
-            </div>
-          </div>
 
-          {/* Location */}
-          <div className="flex items-center gap-2 p-3 bg-gradient-to-r from-slate-50 to-green-50 rounded-xl border border-slate-100">
-            <MapPin size={16} className="text-green-600" />
-            <div>
-              <p className="text-xs text-slate-500 font-medium">Location</p>
-              <p className="text-sm font-bold text-slate-800">{group.location.city}, {group.location.state}</p>
-            </div>
-          </div>
-        </div>
 
         {/* Project Status Grid */}
         <div className="grid grid-cols-2 gap-4">

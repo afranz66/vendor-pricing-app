@@ -76,12 +76,6 @@
       "name": "The Alta Projects",
       "description": "Luxury residential homes featuring modern architecture and premium finishes",
       "type": "residential",
-      "client": "Horizon Homes",
-      "location": {
-        "city": "Metro City",
-        "state": "NY",
-        "region": "Northeast"
-      },
       "image": "/images/groups/the_alta.jpg",
       "totalProjects": 1,
       "totalValue": 4500000,

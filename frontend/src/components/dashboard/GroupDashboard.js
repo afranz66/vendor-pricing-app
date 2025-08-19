@@ -101,41 +101,7 @@ const GroupDashboard = ({ group, onBack, onProjectClick, onGCClick }) => {
                 <p className="text-lg text-slate-600 font-medium mb-4">
                   {group.description}
                 </p>
-                
-                {/* Group Details */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
-                    <Users size={20} className="text-blue-600" />
-                    <div>
-                      <p className="text-xs text-slate-500 font-medium">Client</p>
-                      <p className="font-bold text-slate-800">{group.client}</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
-                    <MapPin size={20} className="text-green-600" />
-                    <div>
-                      <p className="text-xs text-slate-500 font-medium">Location</p>
-                      <p className="font-bold text-slate-800">{group.location.city}, {group.location.state}</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
-                    <Calendar size={20} className="text-purple-600" />
-                    <div>
-                      <p className="text-xs text-slate-500 font-medium">Expected Completion</p>
-                      <p className="font-bold text-slate-800">{new Date(group.expectedCompletion).toLocaleDateString()}</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
-                    <DollarSign size={20} className="text-emerald-600" />
-                    <div>
-                      <p className="text-xs text-slate-500 font-medium">Total Value</p>
-                      <p className="font-bold text-slate-800">${group.totalValue.toLocaleString()}</p>
-                    </div>
-                  </div>
-                </div>
+              
               </div>
             </div>
           </div>
@@ -183,7 +149,7 @@ const GroupDashboard = ({ group, onBack, onProjectClick, onGCClick }) => {
         <h2 className="text-2xl font-bold text-slate-800 mb-6">Projects in {group.name}</h2>
         
         {groupProjects.length > 0 ? (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-1 gap-8">
             {groupProjects.map(project => (
               <ProjectSummaryCard
                 key={project.id}
