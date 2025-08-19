@@ -683,5 +683,71 @@ async def update_vendor(vendor_id: int, updates: Dict[str, Any]):
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error updating vendor: {str(e)}")
+    
+@app.get("/api/groups")
+async def get_groups():
+    """
+    Get all project groups with their metadata
+    """
+    try:
+        data = data_service._read_data()
+        groups = data.get("groups", [])
+        
+        # Enrich groups with calculated metrics from their projects
+        enriched_groups = []
+        projects = data.get("projects", [])
+        
+        for group in groups:
+            # Calculate actual metrics from projects in this group
+            group_projects = [p for p in projects if p.get("groupId") == group["id"]]
+            
+            # Update group with current project metrics
+            enriched_group = group.copy()
+            enriched_group["actualProjectCount"] = len(group_projects)
+            enriched_group["actualTotalValue"] = sum(p.get("estimatedValue", 0) for p in group_projects)
+            enriched_group["activeProjects"] = len([p for p in group_projects if p.get("status") in ["active", "early"]])
+            enriched_group["completedProjects"] = len([p for p in group_projects if p.get("status") == "complete"])
+            
+            enriched_groups.append(enriched_group)
+        
+        return enriched_groups
+        
+    except Exception as e:
+        print(f"Error fetching groups: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error fetching groups: {str(e)}")
+
+@app.get("/api/groups/{group_id}")
+async def get_group(group_id: int):
+    """
+    Get a specific group by ID with its projects
+    """
+    try:
+        data = data_service._read_data()
+        groups = data.get("groups", [])
+        projects = data.get("projects", [])
+        
+        # Find the specific group
+        group = next((g for g in groups if g["id"] == group_id), None)
+        if not group:
+            raise HTTPException(status_code=404, detail=f"Group with id {group_id} not found")
+        
+        # Get projects in this group
+        group_projects = [p for p in projects if p.get("groupId") == group_id]
+        
+        # Enrich group with current metrics
+        enriched_group = group.copy()
+        enriched_group["actualProjectCount"] = len(group_projects)
+        enriched_group["actualTotalValue"] = sum(p.get("estimatedValue", 0) for p in group_projects)
+        enriched_group["activeProjects"] = len([p for p in group_projects if p.get("status") in ["active", "early"]])
+        enriched_group["completedProjects"] = len([p for p in group_projects if p.get("status") == "complete"])
+        enriched_group["projects"] = group_projects
+        
+        return enriched_group
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error fetching group {group_id}: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error fetching group: {str(e)}")
 # You can test your API by running: uvicorn app.main:app --reload
 # Then visit http://localhost:8000/docs to see the interactive API documentation

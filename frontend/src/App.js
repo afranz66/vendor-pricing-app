@@ -25,6 +25,7 @@ import VendorCatalog from './components/vendors/VendorCatalog';
 import CreateVendor from './components/vendors/CreateVendor';
 import CreateProject from './components/projects/CreateProject';
 import GCDetailsPage from './components/contractors/GCDetailsPage';
+import GroupDashboard from './components/dashboard/GroupDashboard';
 import LoadingCard from './components/shared/LoadingCard';
 import ErrorCard from './components/shared/ErrorCard';
 
@@ -38,6 +39,7 @@ function App() {
     selectedProjectId: null,
     selectedCategoryId: null,
     selectedProject: null,
+    selectedGroup: null,
     previousView: null
   });
 
@@ -108,6 +110,16 @@ function App() {
     setSidebarOpen(false);
   };
 
+  const handleGroupClick = (group) => {
+    setNavigationState(prevState => ({
+      ...prevState,
+      selectedGroup: group,
+      previousView: currentView
+    }));
+    setCurrentView('group-dashboard');
+    setSidebarOpen(false);
+  };
+
   const handleBackNavigation = () => {
     const { previousView } = navigationState;
     
@@ -118,6 +130,7 @@ function App() {
           selectedProjectId: null,
           selectedCategoryId: null,
           selectedProject: null,
+          selectedGroup: null,
           previousView: null
         });
         break;
@@ -135,6 +148,7 @@ function App() {
         setNavigationState(prevState => ({
           ...prevState,
           selectedProject: null,
+          selectedGroup: null,
           previousView: null
         }));
         break;
@@ -143,6 +157,7 @@ function App() {
         setNavigationState(prevState => ({
           ...prevState,
           selectedProject: null,
+          selectedGroup: null,
           previousView: null
         }));
         break;
@@ -151,6 +166,14 @@ function App() {
         setNavigationState(prevState => ({
           ...prevState,
           selectedProject: null,
+          previousView: null
+        }));
+        break;
+      case 'group-dashboard':
+        setCurrentView(previousView || 'dashboard');
+        setNavigationState(prevState => ({
+          ...prevState,
+          selectedGroup: null,
           previousView: null
         }));
         break;
@@ -178,6 +201,7 @@ function App() {
         selectedProjectId: null,
         selectedCategoryId: null,
         selectedProject: null,
+        selectedGroup: null,
         previousView: null
       });
     }
@@ -191,6 +215,7 @@ function App() {
       selectedProjectId: null,
       selectedCategoryId: null,
       selectedProject: null,
+      selectedGroup: null,
       previousView: null
     });
   };
@@ -203,6 +228,7 @@ function App() {
             onProjectClick={handleProjectClick}
             onCreateProjectClick={handleCreateProjectClick}
             onGCClick={handleGCClick}
+            onGroupClick={handleGroupClick}
           />
         );
       
@@ -258,6 +284,16 @@ function App() {
           />
         );
 
+      case 'group-dashboard':
+        return (
+          <GroupDashboard
+            group={navigationState.selectedGroup}
+            onBack={handleBackNavigation}
+            onProjectClick={handleProjectClick}
+            onGCClick={handleGCClick}
+          />
+        );
+
       case 'projects':
         return (
           <div className="max-w-7xl mx-auto p-8">
@@ -286,6 +322,7 @@ function App() {
               onProjectClick={handleProjectClick}
               onCreateProjectClick={handleCreateProjectClick}
               onGCClick={handleGCClick}
+              onGroupClick={handleGroupClick}
             />
           </div>
         );
@@ -349,6 +386,7 @@ function App() {
             onProjectClick={handleProjectClick}
             onCreateProjectClick={handleCreateProjectClick}
             onGCClick={handleGCClick}
+            onGroupClick={handleGroupClick}
           />
         );
     }
@@ -398,6 +436,12 @@ function App() {
         breadcrumbs.push(
           { label: 'Dashboard', onClick: () => setCurrentView('dashboard') },
           { label: 'Contractor Details', active: true }
+        );
+        break;
+      case 'group-dashboard':
+        breadcrumbs.push(
+          { label: 'Dashboard', onClick: () => setCurrentView('dashboard') },
+          { label: 'Project Collection', active: true }
         );
         break;
       default:
@@ -518,7 +562,7 @@ function App() {
               {navigationItems.map(item => {
                 const Icon = item.icon;
                 const isActive = currentView === item.id || 
-                  (item.id === 'dashboard' && ['project', 'quote-comparison', 'vendor-management', 'create-project', 'gc-details'].includes(currentView));
+                  (item.id === 'dashboard' && ['project', 'quote-comparison', 'vendor-management', 'create-project', 'gc-details', 'group-dashboard'].includes(currentView));
                 
                 return (
                   <li key={item.id}>
@@ -532,6 +576,7 @@ function App() {
                             selectedProjectId: null,
                             selectedCategoryId: null,
                             selectedProject: null,
+                            selectedGroup: null,
                             previousView: null
                           });
                         }
