@@ -56,12 +56,13 @@ function App() {
 
   // Your existing navigation functions
   const handleProjectClick = (projectId) => {
-    setNavigationState({
+    setNavigationState(prevState => ({
+      ...prevState,
       selectedProjectId: projectId,
       selectedCategoryId: null,
       selectedProject: null,
-      previousView: currentView === 'projects' ? 'projects' : 'dashboard'
-    });
+      previousView: currentView 
+    }));
     setCurrentView('project');
     setSidebarOpen(false);
   };
@@ -126,13 +127,13 @@ function App() {
     switch (currentView) {
       case 'project':
         setCurrentView(previousView || 'dashboard');
-        setNavigationState({
+        setNavigationState(prevState => ({
           selectedProjectId: null,
           selectedCategoryId: null,
           selectedProject: null,
-          selectedGroup: null,
+          selectedGroup: previousView === 'group-dashboard' ? prevState.selectedGroup : null,
           previousView: null
-        });
+        }));
         break;
       case 'quote-comparison':
       case 'vendor-management':
