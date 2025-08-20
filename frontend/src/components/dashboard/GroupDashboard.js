@@ -1,12 +1,11 @@
 // frontend/src/components/dashboard/GroupDashboard.js
-// Dashboard view for projects within a specific group
+// Dashboard view for projects within a specific group - with compact project cards
 
 import React from 'react';
-import { ArrowLeft, Building2, MapPin, Calendar, DollarSign, Users, FolderOpen } from 'lucide-react';
+import { ArrowLeft, Building2, MapPin, Calendar, DollarSign, Users, FolderOpen, Eye, CheckCircle, Clock, AlertCircle } from 'lucide-react';
 import { useProjects } from '../../hooks/useApi';
 import LoadingCard from '../shared/LoadingCard';
 import ErrorCard from '../shared/ErrorCard';
-import ProjectSummaryCard from './ProjectSummaryCard';
 import MetricCard from './MetricCard';
 
 const GroupDashboard = ({ group, onBack, onProjectClick, onGCClick }) => {
@@ -52,8 +51,58 @@ const GroupDashboard = ({ group, onBack, onProjectClick, onGCClick }) => {
     }
   };
 
+  // Helper functions for project status
+  const getProjectStatusStyling = (status) => {
+    const styles = {
+      active: 'from-blue-500 to-indigo-600',
+      early: 'from-purple-500 to-indigo-600',
+      complete: 'from-green-500 to-emerald-600',
+      planning: 'from-yellow-500 to-orange-600'
+    };
+    return styles[status] || styles.planning;
+  };
+
+  const getProjectStatusIcon = (status) => {
+    const icons = {
+      active: <Clock size={12} />,
+      early: <Clock size={12} />,
+      complete: <CheckCircle size={12} />,
+      planning: <Calendar size={12} />
+    };
+    return icons[status] || icons.planning;
+  };
+
+  const formatProjectStatus = (status) => {
+    const labels = {
+      active: 'Active',
+      early: 'Early',
+      complete: 'Done',
+      planning: 'Planning'
+    };
+    return labels[status] || 'Unknown';
+  };
+
+  const formatCurrency = (amount) => {
+    if (!amount) return 'N/A';
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 0
+    }).format(amount);
+  };
+
+  const formatCompactCurrency = (amount) => {
+    if (!amount) return 'N/A';
+    if (amount >= 1000000) {
+      return `$${(amount / 1000000).toFixed(1)}M`;
+    } else if (amount >= 1000) {
+      return `$${(amount / 1000).toFixed(0)}K`;
+    }
+    return formatCurrency(amount);
+  };
+
   return (
-    <div className="max-w-7xl mx-auto p-8">
+    <div className="max-w-7xl mx-auto px-1 py-8">
       {/* Header with Back Button */}
       <div className="mb-8">
         <button 
@@ -63,49 +112,6 @@ const GroupDashboard = ({ group, onBack, onProjectClick, onGCClick }) => {
           <ArrowLeft size={20} />
           Back to Dashboard
         </button>
-        
-        {/* Group Hero Section */}
-        <div className="bg-white/70 backdrop-blur-sm rounded-3xl shadow-xl border border-white/20 overflow-hidden">
-          {/* Hero Image */}
-          <div className="relative h-48 bg-gradient-to-br from-slate-100 to-blue-100">
-            {group.image ? (
-              <img 
-                src={group.image} 
-                alt={group.name}
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  e.target.style.display = 'none';
-                }}
-              />
-            ) : (
-              <div className="w-full h-full bg-gradient-to-br from-slate-200 to-blue-200 flex items-center justify-center">
-                <Building2 size={64} className="text-slate-400" />
-              </div>
-            )}
-            
-            {/* Status Badge */}
-            <div className="absolute top-6 right-6">
-              <div className={`px-4 py-2 rounded-full text-sm font-bold text-white bg-gradient-to-r ${getStatusColor()} shadow-lg`}>
-                {group.status.charAt(0).toUpperCase() + group.status.slice(1)}
-              </div>
-            </div>
-          </div>
-
-          {/* Group Information */}
-          <div className="p-8">
-            <div className="flex justify-between items-start mb-6">
-              <div className="flex-1">
-                <h1 className="text-4xl font-bold bg-gradient-to-r from-slate-800 via-blue-900 to-indigo-900 bg-clip-text text-transparent mb-3">
-                  {group.name}
-                </h1>
-                <p className="text-lg text-slate-600 font-medium mb-4">
-                  {group.description}
-                </p>
-              
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
 
       {/* Group Metrics */}
@@ -144,28 +150,98 @@ const GroupDashboard = ({ group, onBack, onProjectClick, onGCClick }) => {
         />
       </div>
 
-      {/* Projects in Group */}
+      {/* Compact Projects in Group */}
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-slate-800 mb-6">Projects in {group.name}</h2>
-        
-        {groupProjects.length > 0 ? (
-          <div className="grid grid-cols-1 lg:grid-cols-1 gap-8">
-            {groupProjects.map(project => (
-              <ProjectSummaryCard
-                key={project.id}
-                project={project}
-                onClick={() => onProjectClick(project.id)}
-                onGCClick={onGCClick}
-              />
-            ))}
+        <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl border border-white/30 overflow-hidden">
+          <div className="bg-gradient-to-r from-slate-800 via-blue-900 to-indigo-900 p-4">
+            <h2 className="text-xl font-bold text-white">Projects in {group.name}</h2>
+            <p className="text-slate-200 text-sm">Click on any project to view detailed information</p>
           </div>
-        ) : (
-          <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border border-white/30 p-12 text-center">
-            <FolderOpen className="w-16 h-16 text-slate-400 mx-auto mb-4" />
-            <h3 className="text-xl font-bold text-slate-800 mb-2">No Projects Yet</h3>
-            <p className="text-slate-600">Projects will appear here as they're added to this group.</p>
-          </div>
-        )}
+          
+          {groupProjects.length > 0 ? (
+            <div className="p-4">
+              <div className="space-y-2">
+                {groupProjects.map(project => {
+                  const completionPercent = project.metrics?.completionPercentage || 0;
+                  const activeVendors = project.metrics?.activeVendors || 0;
+                  const totalVendors = project.metrics?.totalVendors || 0;
+                  const quotedMaterials = project.metrics?.quotedMaterials || 0;
+                  const totalMaterials = project.metrics?.totalMaterials || 0;
+                  
+                  return (
+                    <div 
+                      key={project.id} 
+                      className="bg-gradient-to-r from-white to-slate-50 border border-slate-200 rounded-md p-3 hover:shadow-md transition-all duration-200 cursor-pointer group hover:border-blue-300 h-min"
+                      onClick={() => onProjectClick(project.id)}
+                    >
+                      <div className="flex items-center justify-between">
+                        {/* Left side - Name and Status */}
+                        <div className="flex items-center gap-3 flex-1 min-w-0">
+                          <h3 className="font-semibold text-slate-800 group-hover:text-blue-700 transition-colors truncate">
+                            {project.name}
+                          </h3>
+                          <span className={`px-2 py-1 rounded-lg text-xs font-semibold text-white flex items-center gap-1 bg-gradient-to-r ${getProjectStatusStyling(project.status)} shadow-sm`}>
+                            {getProjectStatusIcon(project.status)}
+                            {formatProjectStatus(project.status)}
+                          </span>
+                        </div>
+
+                        {/* Middle - Progress and Metrics */}
+                        <div className="flex items-center gap-4 text-sm">
+                          <div className="text-center">
+                            <div className="font-semibold text-slate-700">{activeVendors}/{totalVendors}</div>
+                            <div className="text-xs text-slate-500">Vendors</div>
+                          </div>
+                          <div className="text-center">
+                            <div className="font-semibold text-slate-700">{quotedMaterials}/{totalMaterials}</div>
+                            <div className="text-xs text-slate-500">Materials</div>
+                          </div>
+                        </div>
+
+                        {/* Right side - Value and Actions */}
+                        <div className="flex items-center gap-3 text-sm">
+                          <div className="text-right">
+                            <div className="font-semibold text-slate-800">{formatCompactCurrency(project.estimatedValue)}</div>
+                            <div className="text-xs text-slate-500">Value</div>
+                          </div>
+                          <div className="flex gap-2">
+                            <button 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onGCClick && onGCClick(project.id);
+                              }}
+                              className="p-2 text-purple-600 hover:bg-purple-50 rounded-lg transition-all duration-200"
+                              title="General Contractor View"
+                            >
+                              <Building2 size={16} />
+                            </button>
+                            <button 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onProjectClick(project.id);
+                              }}
+                              className="p-2 text-white bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 rounded-lg transition-all duration-200 shadow-sm"
+                              title="View Project Details"
+                            >
+                              <Eye size={16} />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ) : (
+            <div className="p-12 text-center">
+              <FolderOpen className="w-16 h-16 text-slate-400 mx-auto mb-4" />
+              <h3 className="text-xl font-bold text-slate-800 mb-2">No Projects Yet</h3>
+              <p className="text-slate-600">Projects will appear here as they're added to this group.</p>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

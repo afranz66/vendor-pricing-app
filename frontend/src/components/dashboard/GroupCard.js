@@ -69,7 +69,7 @@ const GroupCard = ({ group, onClick }) => {
         {/* Project Count Badge */}
         <div className="absolute top-4 left-4">
           <div className="px-3 py-1 rounded-full text-sm font-bold bg-black/20 backdrop-blur-sm text-white border border-white/20">
-            {projectCount} Projects
+            {projectCount} Project(s)
           </div>
         </div>
       </div>
@@ -85,8 +85,6 @@ const GroupCard = ({ group, onClick }) => {
             {group.description}
           </p>
         </div>
-
-
 
         {/* Project Status Grid */}
         <div className="grid grid-cols-2 gap-4">

@@ -68,42 +68,6 @@ const Dashboard = ({ onProjectClick, onCreateProjectClick, onGCClick, onGroupCli
         </div>
       </div>
 
-      {/* Portfolio Metrics Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
-        <MetricCard
-          title="Total Projects"
-          value={portfolioMetrics.totalProjects}
-          subtitle="Across all collections"
-          icon={FileText}
-          color="from-blue-100 to-indigo-100"
-          iconColor="text-blue-600"
-        />
-        <MetricCard
-          title="Project Collections"
-          value={portfolioMetrics.totalGroups}
-          subtitle="Active groups"
-          icon={FolderOpen}
-          color="from-purple-100 to-pink-100"
-          iconColor="text-purple-600"
-        />
-        <MetricCard
-          title="Active Projects"
-          value={portfolioMetrics.activeProjects}
-          subtitle="Currently in progress"
-          icon={Clock}
-          color="from-amber-100 to-orange-100"
-          iconColor="text-amber-600"
-        />
-        <MetricCard
-          title="Portfolio Value"
-          value={`${(portfolioMetrics.totalValue / 1000000).toFixed(1)}M`}
-          subtitle="Total estimated value"
-          icon={TrendingUp}
-          color="from-emerald-100 to-teal-100"
-          iconColor="text-emerald-600"
-        />
-      </div>
-
       {/* Project Groups Section */}
       <div className="mb-10">
         <div className="flex justify-between items-center mb-8">

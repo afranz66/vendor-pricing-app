@@ -658,30 +658,6 @@ function App() {
               </div>
             </div>
 
-            <div>
-              <h3 className="text-lg font-bold text-slate-800 mb-4">Quick Actions</h3>
-              <div className="space-y-2">
-                <button 
-                  onClick={handleCreateProjectClick}
-                  className="w-full text-left px-4 py-3 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-100 hover:from-blue-100 hover:to-indigo-100 transition-all"
-                >
-                  <p className="text-sm font-medium text-slate-800">Create New Project</p>
-                </button>
-                <button 
-                  onClick={handleCreateVendorClick}
-                  className="w-full text-left px-4 py-3 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-lg border border-emerald-100 hover:from-emerald-100 hover:to-teal-100 transition-all"
-                >
-                  <p className="text-sm font-medium text-slate-800">Add New Vendor</p>
-                </button>
-                <button 
-                  onClick={() => setCurrentView('reports')}
-                  className="w-full text-left px-4 py-3 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg border border-purple-100 hover:from-purple-100 hover:to-pink-100 transition-all"
-                >
-                  <p className="text-sm font-medium text-slate-800">View Reports</p>
-                </button>
-              </div>
-            </div>
-
             {/* Project Quick Stats */}
             {projects && projects.length > 0 && (
               <div>
@@ -701,7 +677,7 @@ function App() {
                     <p className="text-2xl font-bold text-purple-700">
                       ${(projects.reduce((sum, p) => sum + (p.estimatedValue || 0), 0) / 1000000).toFixed(1)}M
                     </p>
-                    <p className="text-sm text-purple-600">Total Value</p>
+                    <p className="text-sm text-purple-600">Total Saved</p>
                   </div>
                 </div>
               </div>
